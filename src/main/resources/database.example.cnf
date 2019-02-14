@@ -1,0 +1,5 @@
+IP=localhost
+PORT=3306
+DATABASE=auth1
+USERNAME=auth1
+PASSWORD=password
