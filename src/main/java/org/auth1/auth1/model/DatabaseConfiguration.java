@@ -7,6 +7,8 @@ import java.util.Properties;
 
 public class DatabaseConfiguration {
 
+    static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%d/%s";
+
     private final InetAddress ip;
     private final int port;
     private final String database;
@@ -34,7 +36,7 @@ public class DatabaseConfiguration {
     }
 
     public String getURL() {
-        return String.format("jdbc:mysql://%s:%d/%s", ip.getHostName(), port, database);
+        return String.format(JDBC_URL_FORMAT, ip.getHostName(), port, database);
     }
 
     public String getUsername() {
