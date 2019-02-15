@@ -36,10 +36,6 @@ class DatabaseConfigurationTest {
         databaseConfiguration = new DatabaseConfiguration(mockIp, port, database, username, password);
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void getIp() {
         assertEquals(mockIp, databaseConfiguration.getIp());

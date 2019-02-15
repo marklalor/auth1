@@ -1,0 +1,4 @@
+2/15/19:
+- I added an example test for the DatabaseConfiguration class to complete the task of starting the testing framework
+- I added DatabaseLoader.java which starts an embedded MySQL instance to complete the task of creating a method to setup
+a database instance

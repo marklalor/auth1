@@ -1,35 +1,68 @@
-//package org.auth1.auth1.database;
-//
-//public class DatabaseLoader {
-//
-//    public void startDatabase() {
-//        // starting Postgres
-//        final EmbeddedPostgres postgres = new EmbeddedPostgres(V9_6);
-//// predefined data directory
-//// final EmbeddedPostgres postgres = new EmbeddedPostgres(V9_6, "/path/to/predefined/data/directory");
-//        final String url = postgres.start("localhost", 5432, "dbName", "userName", "password");
-//
-//// connecting to a running Postgres and feeding up the database
-//        final Connection conn = DriverManager.getConnection(url);
-//        conn.createStatement().execute("CREATE TABLE films (code char(5));");
-//        conn.createStatement().execute("INSERT INTO films VALUES ('movie');");
-//
-//// ... or you can execute SQL files...
-////postgres.getProcess().importFromFile(new File("someFile.sql"))
-//// ... or even SQL files with PSQL variables in them...
-////postgres.getProcess().importFromFileWithArgs(new File("someFile.sql"), "-v", "tblName=someTable")
-//// ... or even restore database from dump file
-////postgres.getProcess().restoreFromFile(new File("src/test/resources/test.binary_dump"))
-//
-//// performing some assertions
-//        final Statement statement = conn.createStatement();
-//        assertThat(statement.execute("SELECT * FROM films;"), is(true));
-//        assertThat(statement.getResultSet().next(), is(true));
-//        assertThat(statement.getResultSet().getString("code"), is("movie"));
-//
-//// close db connection
-//        conn.close();
-//// stop Postgres
-//        postgres.stop();
-//    }
-//}
+package org.auth1.auth1.database;
+
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.wix.mysql.EmbeddedMysql;
+import com.wix.mysql.config.MysqldConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.concurrent.TimeUnit;
+
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.config.Charset.UTF8;
+import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
+import static com.wix.mysql.distribution.Version.v5_6_23;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class DatabaseLoader {
+
+    private static final String user = "root";
+    private static final String password = "";
+    private static final int port = 2215;
+    private EmbeddedMysql mysqld;
+
+    @Before
+    public void startDB() {
+        final MysqldConfig config = aMysqldConfig(v5_6_23)
+                .withCharset(UTF8)
+                .withPort(port)
+                .withTimeout(2, TimeUnit.MINUTES)
+                .build();
+        mysqld = anEmbeddedMysql(config)
+                .addSchema("aschema", classPathScript("db/001_init.sql"))
+                .start();
+    }
+
+    @Test
+    public void getFamilyMembers() {
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setUser(user);
+        dataSource.setPassword(password);
+        dataSource.setDatabaseName("testDB");
+        dataSource.setPort(port);
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM family;")) {
+            rs.next();
+            assertEquals("Brian", rs.getString("name"));
+            rs.next();
+            assertEquals("Mark", rs.getString("name"));
+            rs.next();
+            assertEquals("Yidi", rs.getString("name"));
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @After
+    public void closeDB() {
+        mysqld.stop();
+    }
+}
