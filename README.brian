@@ -2,3 +2,7 @@
 - I added an example test for the DatabaseConfiguration class to complete the task of starting the testing framework
 - I added DatabaseLoader.java which starts an embedded MySQL instance to complete the task of creating a method to setup
 a database instance
+
+Notes: A majority of my time was spent debugging issues with the embedded MySQL library. After solving various issues,
+the resulting DatabaseLoader.java will load a MySQL instance, load a schema, run a test on a table, and close the
+connection and MySQL instance.
