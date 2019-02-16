@@ -1,0 +1,5 @@
+2/15:
+- I set up the Spring Boot dependencies and built a dummy endpoint to learn how to use the framework.
+
+Notes: We initially had planned on building an API stub at this time, but decided it would be unnecessary given how simple
+it is to set up routes in Spring Boot, and that we weren't working on any features which depended on it
