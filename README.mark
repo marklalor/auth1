@@ -1,0 +1,6 @@
+2/15/2019
+– Added dependencies for Spring Hibernate (object relational model) mapping libary.
+– Created data classes marked with the javax.persistance.* API for use with Spring Hibernate.
+– Added database initialization script.
+– Created configuration file for setting database credentials.
+– Created configuration file for hash options (bcrypt/scrypt + parameters)
