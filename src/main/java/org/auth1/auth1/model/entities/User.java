@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 @Table(name = "User")
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -32,4 +32,13 @@ public class User {
     @Column(name = "creation_time")
     private ZonedDateTime creationTime;
 
+    public User(String username, String password, byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
+        this.username = username;
+        this.password = password;
+        this.totpSecret = totpSecret;
+        this.email = email;
+        this.verified = verified;
+        this.locked = locked;
+        this.creationTime = creationTime;
+    }
 }
