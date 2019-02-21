@@ -5,10 +5,12 @@ import com.google.common.io.Resources;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.NativeQuery;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Arrays;
 
+@Service
 public class DatabaseManager {
     private final DatabaseConfiguration configuration;
     private final SessionFactory sessionFactory;
@@ -40,5 +42,9 @@ public class DatabaseManager {
             System.err.print("Could not load database initialization file... shutting down.");
             System.exit(1);
         }
+    }
+
+    public SessionFactory getSessionFactory() {
+        return this.sessionFactory;
     }
 }
