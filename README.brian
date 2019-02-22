@@ -1,3 +1,8 @@
+2/21/19:
+- I created the UserDAO and a register method
+- I created an integration test for the register method
+- I added Spring annotations to create beans/repositories/services to allow dependency inject to be managed by Spring
+
 2/15/19:
 - I added an example test for the DatabaseConfiguration class to complete the task of starting the testing framework
 - I added DatabaseLoader.java which starts an embedded MySQL instance to complete the task of creating a method to setup
