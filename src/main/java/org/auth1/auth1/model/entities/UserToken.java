@@ -16,6 +16,6 @@ public class UserToken {
     private ZonedDateTime issueTime;
 
     @Column(name = "expiration_time")
-    private ZonedDateTime expirationime;
+    private ZonedDateTime expirationTime;
 
 }
