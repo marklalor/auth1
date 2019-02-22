@@ -5,10 +5,13 @@ import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.model.entities.UserToken;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
 
     private final DatabaseManager databaseManager;
 
@@ -31,21 +34,31 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public void setPasswordResetToken(String username, String passwordResetToken) {
-
+        throw new NotYetImplementedException();
     }
 
     @Override
     public void lockUser(String username) {
-
+        throw new NotYetImplementedException();
     }
 
     @Override
     public void unlockUser(String username) {
-
+        throw new NotYetImplementedException();
     }
 
     @Override
     public void resetPassword(String username, String password) {
+        throw new NotYetImplementedException();
+    }
 
+    @Override
+    public Optional<User> getUserByUsername(String username) {
+        throw new NotYetImplementedException();
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        throw new NotYetImplementedException();
     }
 }

@@ -7,6 +7,7 @@ public class AuthenticationResult {
         SUCCESS,
         BAD_USERNAME,
         BAD_EMAIL,
+        BAD_USERNAME_OR_EMAIL,
         BAD_PASSWORD,
         TOO_MANY_REQUESTS,
         ACCOUNT_LOCKED
