@@ -1,4 +1,4 @@
-package org.auth1.auth1.status;
+package org.auth1.auth1.api.status;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package org.auth1.auth1.status;
+package org.auth1.auth1.api.status;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.auth1.auth1.status.Status.Feature.*;
+import static org.auth1.auth1.api.status.Status.Feature.*;
 
 @RestController
 public class StatusController {

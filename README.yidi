@@ -3,3 +3,14 @@
 
 Notes: We initially had planned on building an API stub at this time, but decided it would be unnecessary given how simple
 it is to set up routes in Spring Boot, and that we weren't working on any features which depended on it
+
+2/22:
+- I stubbed out the /register endpoint this week. We planned on building out this feature fully, but missed this goal due
+to a miscommunication in Asana. This might set back our integration testing a little bit, but we have the logic for authenticating
+tokens done ahead of schedule, so we should still be on course.
+- We had a productive discussion regarding the interface between the business logic (which we will designate as controller)
+and the API. We decided that the API can handle basic sanity checks on the parameters, and that we would overload the API instead
+of the controller in cases where we might want some flexibility (such as logging in with email || username)
+
+Notes: Had a lot of trouble working out kinks in configurations and framework issues. Still don't have things fully working with
+IntelliJ but managed to find workarounds for everything in the terminal.

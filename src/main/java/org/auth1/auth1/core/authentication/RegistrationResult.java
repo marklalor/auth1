@@ -6,5 +6,6 @@ public enum RegistrationResult {
     USERNAME_DUPLICATE,
     EMAIL_DUPLICATE,
     EMAIL_REQUIRED,
-    PASSWORD_WEAK
+    PASSWORD_WEAK,
+    SERVICE_UNAVAILABLE
 }
