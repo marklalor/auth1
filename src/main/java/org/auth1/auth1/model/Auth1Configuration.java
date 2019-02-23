@@ -1,10 +1,36 @@
 package org.auth1.auth1.model;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.function.Function;
 
 public class Auth1Configuration {
+
+    public interface HashFunction {
+        String hash(String plaintext);
+    }
+
+    public interface CheckFunction {
+        boolean check(String plaintext, String hashed);
+    }
+
+    public HashFunction getHashFunction() {
+        return this.getHashAlgorithm() == HashAlgorithm.BCRYPT ?
+                rawPassword -> BCrypt.hashpw(rawPassword, BCrypt.gensalt(this.bcryptCost)) :
+                rawPassword -> new SCryptPasswordEncoder(this.scryptCost, this.scryptBlockSize,
+                        this.scryptParallelization, 32,64).encode(rawPassword);
+    }
+
+    public CheckFunction getCheckFunction() {
+        return this.getHashAlgorithm() == HashAlgorithm.BCRYPT ?
+                (plaintext, hashed) -> BCrypt.checkpw(plaintext, hashed) :
+                (plaintext, hashed) -> new SCryptPasswordEncoder(this.scryptCost, this.scryptBlockSize,
+                        this.scryptParallelization, 32,64).matches(plaintext, hashed);
+    }
 
     public enum HashAlgorithm {
         BCRYPT,

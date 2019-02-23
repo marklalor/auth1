@@ -17,7 +17,11 @@ public class Auth1 {
         this.databaseManager.initializeDatabase();
     }
 
-    public void serveAPI(InetAddress bindAddress, int port) {
+    public Auth1Configuration getAuth1Configuration() {
+        return auth1Configuration;
+    }
 
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

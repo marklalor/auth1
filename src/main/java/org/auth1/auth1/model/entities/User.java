@@ -18,7 +18,7 @@ public class User {
     private String password;
 
     @Column(name = "totp_secret")
-    private byte[] totpSecret;
+    private Byte[] totpSecret;
 
     @Column(name = "email")
     private String email;
@@ -32,7 +32,7 @@ public class User {
     @Column(name = "creation_time")
     private ZonedDateTime creationTime;
 
-    public User(String username, String password, byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
+    public User(String username, String password, Byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
         this.username = username;
         this.password = password;
         this.totpSecret = totpSecret;
@@ -40,5 +40,37 @@ public class User {
         this.verified = verified;
         this.locked = locked;
         this.creationTime = creationTime;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Byte[] getTotpSecret() {
+        return totpSecret;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public ZonedDateTime getCreationTime() {
+        return creationTime;
     }
 }

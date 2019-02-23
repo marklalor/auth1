@@ -19,7 +19,6 @@ public class CLI {
             final DatabaseConfiguration databaseConfiguration
                     = DatabaseConfiguration.fromConfigurationFile(new FileInputStream(databaseConfigurationPath));
             final var auth1Instance = new Auth1(auth1Configuration, databaseConfiguration);
-//            auth1Instance.serveAPI(..., ...);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
