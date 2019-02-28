@@ -34,6 +34,10 @@ public class User {
     @Column(name = "creation_time")
     private ZonedDateTime creationTime;
 
+    public User() {
+
+    }
+
     public User(String username, String password, byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
         this.username = username;
         this.password = password;
@@ -81,20 +85,15 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return id == user.id &&
-                verified == user.verified &&
+        return verified == user.verified &&
                 locked == user.locked &&
                 Objects.equals(username, user.username) &&
                 Objects.equals(password, user.password) &&
-                Arrays.equals(totpSecret, user.totpSecret) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(creationTime, user.creationTime);
+                Objects.equals(email, user.email);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, username, password, email, verified, locked, creationTime);
-        result = 31 * result + Arrays.hashCode(totpSecret);
-        return result;
+        return Objects.hash(username, password, email, verified, locked);
     }
 }

@@ -53,6 +53,7 @@ public class DatabaseLoader {
     }
 
     public void closeDB() {
-        mysqld.stop();
+        if (mysqld != null)
+            mysqld.stop();
     }
 }
