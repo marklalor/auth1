@@ -2,7 +2,6 @@ package org.auth1.auth1.dao;
 
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.model.entities.UserToken;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.NotYetImplementedException;
@@ -20,8 +19,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserToken login(String username, String password) {
-        return null;
+    public boolean login(String username, String password) {
+        final SessionFactory sessionFactory = databaseManager.getSessionFactory();
+        final Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        final User user = session.load(User.class, username);
+        session.getTransaction().commit();
+        return user.getPassword().equals(password);
     }
 
     public void register(final User user) {
@@ -54,11 +58,16 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> getUserByUsername(String username) {
-        throw new NotYetImplementedException();
+        final SessionFactory sessionFactory = databaseManager.getSessionFactory();
+        final Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        final User user = session.get(User.class, username);
+        session.getTransaction().commit();
+        return Optional.of(user);
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        throw new NotYetImplementedException();
+        return getUserByUsername(email);
     }
 }

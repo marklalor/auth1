@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.ZonedDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,5 +66,11 @@ class UserDaoImplTest {
         } catch (SQLException e) {
             throw e;
         }
+    }
+
+    @Test
+    void login() throws SQLException {
+        userDao.register(exampleUser);
+        assertTrue(userDao.login(username, password));
     }
 }

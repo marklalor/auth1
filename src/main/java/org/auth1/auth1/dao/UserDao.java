@@ -1,12 +1,11 @@
 package org.auth1.auth1.dao;
 
 import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.model.entities.UserToken;
 
 import java.util.Optional;
 
 public interface UserDao {
-    UserToken login(final String username, final String password);
+    boolean login(final String username, final String password);
 
     void register(final User user);
 
