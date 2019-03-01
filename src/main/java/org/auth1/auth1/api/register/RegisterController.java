@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class RegisterService {
+public class RegisterController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public RegistrationResponse register(@RequestParam(value="username", required=true) String username,
                                          @RequestParam(value="email", required=true) String email,
