@@ -1,3 +1,7 @@
+3/1/19:
+- I added a fetch user/login method to the UserDAO
+- I added integration tests for fetch user/login, for multiple cases
+
 2/21/19:
 - I created the UserDAO and a register method
 - I created an integration test for the register method

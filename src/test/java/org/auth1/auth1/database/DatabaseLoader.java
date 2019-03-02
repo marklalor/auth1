@@ -18,7 +18,7 @@ import static com.wix.mysql.distribution.Version.v5_6_23;
 public class DatabaseLoader {
 
     private static final String IP = "localhost";
-    private static final int PORT = 3306;
+    private static final int PORT = 3307;
     private static final String DATABASE = "auth1";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
@@ -53,6 +53,7 @@ public class DatabaseLoader {
     }
 
     public void closeDB() {
-        mysqld.stop();
+        if (mysqld != null)
+            mysqld.stop();
     }
 }

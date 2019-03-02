@@ -2,6 +2,8 @@ package org.auth1.auth1.model.entities;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Entity
 @Table(name = "User")
@@ -18,7 +20,7 @@ public class User {
     private String password;
 
     @Column(name = "totp_secret")
-    private Byte[] totpSecret;
+    private byte[] totpSecret;
 
     @Column(name = "email")
     private String email;
@@ -32,7 +34,11 @@ public class User {
     @Column(name = "creation_time")
     private ZonedDateTime creationTime;
 
-    public User(String username, String password, Byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
+    public User() {
+
+    }
+
+    public User(String username, String password, byte[] totpSecret, String email, boolean verified, boolean locked, ZonedDateTime creationTime) {
         this.username = username;
         this.password = password;
         this.totpSecret = totpSecret;
@@ -54,7 +60,7 @@ public class User {
         return password;
     }
 
-    public Byte[] getTotpSecret() {
+    public byte[] getTotpSecret() {
         return totpSecret;
     }
 
@@ -72,5 +78,22 @@ public class User {
 
     public ZonedDateTime getCreationTime() {
         return creationTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return verified == user.verified &&
+                locked == user.locked &&
+                Objects.equals(username, user.username) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password, email, verified, locked);
     }
 }
