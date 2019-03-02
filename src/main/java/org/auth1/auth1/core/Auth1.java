@@ -4,7 +4,6 @@ import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.DatabaseConfiguration;
 import org.auth1.auth1.model.DatabaseManager;
 
-import java.net.InetAddress;
 
 public class Auth1 {
 
