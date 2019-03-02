@@ -5,12 +5,12 @@ import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.auth1.auth1.model.entities.User;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,6 +20,7 @@ import static org.auth1.auth1.core.authentication.AuthenticationStepResult.of;
 import static org.auth1.auth1.core.authentication.AuthenticationStepResult.stepPassed;
 import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.*;
 
+@Component
 public class AuthenticationManager {
     private final Auth1 auth1;
     private final UserDao userDao;
