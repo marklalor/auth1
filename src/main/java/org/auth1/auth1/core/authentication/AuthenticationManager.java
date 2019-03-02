@@ -3,13 +3,14 @@ package org.auth1.auth1.core.authentication;
 import org.auth1.auth1.core.Auth1;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
-import org.auth1.auth1.model.entities.LoginToken;
+import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.auth1.auth1.model.entities.User;
 
 import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,6 +33,14 @@ public class AuthenticationManager {
         this.steps = StreamSupport.stream(STEPS.spliterator(), false)
                 .map(f -> f.apply(this))
                 .collect(Collectors.toList());
+    }
+
+    public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
+        return tokenDao
+                .getToken(token)
+                .map(UserAuthenticationToken::getUserId)
+                .map(CheckAuthenticationTokenResult::forSuccess)
+                .orElseGet(CheckAuthenticationTokenResult::forInvalid);
     }
 
     public RegistrationResult register(@Nullable  final String username, @Nullable final String email, final String rawPassword) {
@@ -80,7 +89,7 @@ public class AuthenticationManager {
                 .orElse(stepPassed())
                 .getResult()
                 .orElseGet(() -> {
-                    final LoginToken token = LoginToken.withDuration(user.getId(), 23, TimeUnit.HOURS);
+                    final UserAuthenticationToken token = UserAuthenticationToken.withDuration(user.getId(), 23, TimeUnit.HOURS);
                     tokenDao.saveLoginToken(token);
                     return AuthenticationResult.forSuccess(new AuthenticationToken(token.getValue(), token.getExpirationTime()));
                 });

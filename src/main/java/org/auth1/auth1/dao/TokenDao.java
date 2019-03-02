@@ -1,13 +1,13 @@
 package org.auth1.auth1.dao;
 
-import org.auth1.auth1.model.entities.LoginToken;
-import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.model.entities.UserToken;
+import org.auth1.auth1.core.authentication.AuthenticationToken;
+import org.auth1.auth1.model.entities.UserAuthenticationToken;
 
 import java.util.Optional;
 
 public interface TokenDao {
 
-    void saveLoginToken(final LoginToken token);
+    void saveLoginToken(final UserAuthenticationToken token);
 
+    Optional<UserAuthenticationToken> getToken(String token);
 }
