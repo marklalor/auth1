@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `LoginRecord` (
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `LoginToken` (
+CREATE TABLE IF NOT EXISTS `UserAuthenticationToken` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`user_id` INT NOT NULL,
 	`issue_time` DATETIME NOT NULL,

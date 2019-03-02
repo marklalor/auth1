@@ -1,12 +1,14 @@
 package org.auth1.auth1.model;
 
+import com.google.common.base.Enums;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Auth1Configuration {
 
@@ -45,12 +47,24 @@ public class Auth1Configuration {
     private final int scryptBlockSize;
     private final int scryptParallelization;
 
-    public Auth1Configuration(HashAlgorithm hashAlgorithm, int bcryptCost, int scryptCost, int scryptBlockSize, int scryptParallelization) {
+    public enum RequiredUserFields {
+        USERNAME_ONLY,
+        EMAIL_ONLY,
+        USERNAME_AND_EMAIL
+    }
+
+    private final RequiredUserFields requiredUserFields;
+
+    private final boolean emailVerificationRequired;
+
+    public Auth1Configuration(HashAlgorithm hashAlgorithm, int bcryptCost, int scryptCost, int scryptBlockSize, int scryptParallelization, RequiredUserFields requiredUserFields, boolean emailVerificationRequired) {
         this.hashAlgorithm = hashAlgorithm;
         this.bcryptCost = bcryptCost;
         this.scryptCost = scryptCost;
         this.scryptBlockSize = scryptBlockSize;
         this.scryptParallelization = scryptParallelization;
+        this.requiredUserFields = requiredUserFields;
+        this.emailVerificationRequired = emailVerificationRequired;
     }
 
     public HashAlgorithm getHashAlgorithm() {
@@ -82,6 +96,14 @@ public class Auth1Configuration {
     public int getScryptParallelization() {
         require(HashAlgorithm.SCRYPT);
         return scryptParallelization;
+    }
+
+    public RequiredUserFields getRequiredUserFields() {
+        return requiredUserFields;
+    }
+
+    public boolean isEmailVerificationRequired() {
+        return emailVerificationRequired;
     }
 
     /**
@@ -129,6 +151,19 @@ public class Auth1Configuration {
             throw new Configuration.InvalidConfigurationException(e.getMessage());
         }
 
-        return new Auth1Configuration(hashAlgorithm, bcryptCost, scryptCost, scryptBlockSize, scryptParallelization);
+        final RequiredUserFields requiredUserFields = Enums
+                .getIfPresent(RequiredUserFields.class, Configuration.getRequiredProperty(properties, "REQUIRED_USER_FIELDS"))
+                .toJavaUtil()
+                .orElseThrow(() -> new Configuration.InvalidConfigurationException(
+                        "REQUIRED_USER_FIELDS does not match any of "
+                                + Arrays.stream(RequiredUserFields.values())
+                                .map(RequiredUserFields::toString)
+                                .collect(Collectors.joining(", "))));
+
+        final boolean emailVerificationRequired = Configuration
+                .getRequiredProperty(properties, "EMAIL_VERIFICATION_REQUIRED")
+                .equalsIgnoreCase("true");
+
+        return new Auth1Configuration(hashAlgorithm, bcryptCost, scryptCost, scryptBlockSize, scryptParallelization, requiredUserFields, emailVerificationRequired);
     }
 }

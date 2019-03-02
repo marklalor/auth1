@@ -1,11 +1,9 @@
 package org.auth1.auth1.model.entities;
 
-import org.springframework.util.Base64Utils;
-
-import javax.persistence.*;
-import java.security.SecureRandom;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.time.ZonedDateTime;
-import java.util.concurrent.TimeUnit;
 
 @MappedSuperclass
 public class UserToken {

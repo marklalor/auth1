@@ -5,11 +5,12 @@ import javax.annotation.Nullable;
 public class AuthenticationResult {
     public enum ResultType {
         SUCCESS,
-        BAD_USERNAME,
-        BAD_EMAIL,
-        BAD_USERNAME_OR_EMAIL,
+        USERNAME_DOES_NOT_EXIST,
+        EMAIL_DOES_NOT_EXIST,
+        USERNAME_OR_EMAIL_DOES_NOT_EXIST,
         BAD_PASSWORD,
         TOO_MANY_REQUESTS,
+        NOT_VERIFIED,
         ACCOUNT_LOCKED
     }
 
