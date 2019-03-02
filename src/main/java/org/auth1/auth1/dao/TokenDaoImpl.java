@@ -5,6 +5,8 @@ import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class TokenDaoImpl implements TokenDao {
 
@@ -18,4 +20,10 @@ public class TokenDaoImpl implements TokenDao {
     public void saveLoginToken(UserAuthenticationToken token) {
         throw new NotYetImplementedException();
     }
+
+    @Override
+    public Optional<UserAuthenticationToken> getToken(String token) {
+        throw new NotYetImplementedException();
+    }
+
 }

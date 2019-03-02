@@ -42,4 +42,23 @@ public class AuthenticationResult {
 
         return new AuthenticationResult(type, null, null, null);
     }
+
+    public ResultType getType() {
+        return type;
+    }
+
+    @Nullable
+    public AuthenticationToken getAuthenticationToken() {
+        return authenticationToken;
+    }
+
+    @Nullable
+    public Double getRateLimit() {
+        return rateLimit;
+    }
+
+    @Nullable
+    public Double getRatePeriod() {
+        return ratePeriod;
+    }
 }

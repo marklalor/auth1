@@ -14,3 +14,8 @@ of the controller in cases where we might want some flexibility (such as logging
 
 Notes: Had a lot of trouble working out kinks in configurations and framework issues. Still don't have things fully working with
 IntelliJ but managed to find workarounds for everything in the terminal.
+
+3/1:
+- I wired up the /register endpoint this week, and also implemented the /login and /checkAuthToken endpoints
+- I wrote unit tests for all of these endpoints. If something breaks it's not my fault!
+- Next week it's my turn to do integration tests.
