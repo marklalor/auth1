@@ -11,3 +11,10 @@
 - Validated the password hash in the current authenticate methods.
 - Added several methods for communicating with the API layer for authentication and registration.
 - Generated login tokens based on the duration.
+
+3/1/2019
+- Inserted authentication steps for checking for locked accounts or accounts requiring verification.
+- Added configuration option for the various username/email combination required.
+- Added configuration option for whether or not email verification is required.
+- Added account registration in AuthenticationManager.
+- Validate user authentication tokens.
