@@ -33,7 +33,7 @@ public class RegisterControllerTest {
 
     private JacksonTester<RegistrationResponse> json;
 
-    private final String ENDPOINT = "/register";
+    private final String ENDPOINT = "/saveUser";
 
     private final String VALID_USERNAME = "username";
     private final String VALID_EMAIL = "user@email.com";

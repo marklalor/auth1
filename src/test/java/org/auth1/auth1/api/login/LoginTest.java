@@ -3,7 +3,7 @@ package org.auth1.auth1.api.login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
-import org.auth1.auth1.core.authentication.AuthenticationToken;
+import org.auth1.auth1.core.authentication.ExpiringToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,14 +32,14 @@ public class LoginTest {
     private final String VALID_EMAIL = "user@email.com";
     private final String VALID_PASSWORD = "password";
     private final String INVALID_PASSWORD = "badpass";
-    private final AuthenticationToken VALID_TOKEN = new AuthenticationToken("foo", NOW);
+    private final ExpiringToken VALID_TOKEN = new ExpiringToken("foo", NOW);
     private MockMvc mvc;
     @Mock
     private AuthenticationManager authenticationManager;
     @InjectMocks
     private AuthenticationController authenticationController;
     private JacksonTester<LoginResponse> responseJson;
-    private JacksonTester<AuthenticationToken> tokenJson;
+    private JacksonTester<ExpiringToken> tokenJson;
 
     @Before
     public void setup() {

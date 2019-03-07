@@ -3,53 +3,53 @@ package org.auth1.auth1.core.authentication;
 import javax.annotation.Nullable;
 
 public class AuthenticationResult {
+    public static final AuthenticationResult USER_DOES_NOT_EXIST
+            = new AuthenticationResult(ResultType.USER_DOES_NOT_EXIST, null, null, null);
+    public static final AuthenticationResult BAD_PASSWORD
+            = new AuthenticationResult(ResultType.BAD_PASSWORD, null, null, null);
+    public static final AuthenticationResult NOT_VERIFIED
+            = new AuthenticationResult(ResultType.NOT_VERIFIED, null, null, null);
+    public static final AuthenticationResult ACCOUNT_LOCKED
+            = new AuthenticationResult(ResultType.ACCOUNT_LOCKED, null, null, null);
+
+
     public enum ResultType {
         SUCCESS,
-        USERNAME_DOES_NOT_EXIST,
-        EMAIL_DOES_NOT_EXIST,
-        USERNAME_OR_EMAIL_DOES_NOT_EXIST,
-        BAD_PASSWORD,
         TOO_MANY_REQUESTS,
+        USER_DOES_NOT_EXIST,
+        BAD_PASSWORD,
         NOT_VERIFIED,
         ACCOUNT_LOCKED
     }
 
     private final ResultType type;
-    private final @Nullable AuthenticationToken authenticationToken;
+    private final @Nullable ExpiringToken userAuthenticationToken;
     private final @Nullable Double rateLimit; // number of logins per period/window (milliseconds)
     private final @Nullable Double ratePeriod; // milliseconds of the login period/window
 
-    private AuthenticationResult(ResultType type, @Nullable AuthenticationToken authenticationToken, @Nullable Double rateLimit, @Nullable Double ratePeriod) {
+    private AuthenticationResult(ResultType type, @Nullable ExpiringToken userAuthenticationToken, @Nullable Double rateLimit, @Nullable Double ratePeriod) {
         this.type = type;
-        this.authenticationToken = authenticationToken;
+        this.userAuthenticationToken = userAuthenticationToken;
         this.rateLimit = rateLimit;
         this.ratePeriod = ratePeriod;
     }
 
-    public static AuthenticationResult forSuccess(AuthenticationToken token) {
-        return new AuthenticationResult(ResultType.SUCCESS, token, null, null);
+    public static AuthenticationResult forSuccess(ExpiringToken userAuthenticationToken) {
+        return new AuthenticationResult(ResultType.SUCCESS, userAuthenticationToken, null, null);
     }
 
     public static AuthenticationResult forTooManyRequests(double rateLimit, double ratePeriod) {
         return new AuthenticationResult(ResultType.TOO_MANY_REQUESTS, null, rateLimit, ratePeriod);
     }
 
-    public static AuthenticationResult forResult(ResultType type) {
-        if (type == ResultType.SUCCESS || type == ResultType.TOO_MANY_REQUESTS) {
-            throw new RuntimeException("ResultType.SUCCESS and ResultType.TOO_MANY_REQUESTS should be handled " +
-                    "with .forSuccess and .forTooManyRequests");
-        }
-
-        return new AuthenticationResult(type, null, null, null);
-    }
 
     public ResultType getType() {
         return type;
     }
 
     @Nullable
-    public AuthenticationToken getAuthenticationToken() {
-        return authenticationToken;
+    public ExpiringToken getUserAuthenticationToken() {
+        return userAuthenticationToken;
     }
 
     @Nullable

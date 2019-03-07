@@ -22,6 +22,10 @@ class AuthenticationStepResult {
         return result == null;
     }
 
+    public boolean failed() {
+        return result != null;
+    }
+
     public Optional<AuthenticationResult> getResult() {
         return Optional.ofNullable(result);
     }

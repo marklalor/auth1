@@ -3,6 +3,7 @@ package org.auth1.auth1.core.authentication;
 import org.auth1.auth1.core.Auth1;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
+import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.auth1.auth1.model.entities.User;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,58 @@ public class AuthenticationManager {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Wrapper for inner functions that expect an unlocked User to perform their functions.
+     */
+    private <T> T performWithExistingAndUnlockedAccount(UserIdentifier userId, Function<User, T> function,
+                                                        T accountDoesNotExistResult, T accountIsLockedResult) {
+        return userId
+                .getUser(userDao)
+                .map(user -> {
+                    if (user.isLocked()) {
+                        return accountIsLockedResult;
+                    } else {
+                        return function.apply(user);
+                    }
+                })
+                .orElse(accountDoesNotExistResult);
+    }
+
+    public GeneratePaswordResetTokenResult generatePasswordResetToken(UserIdentifier userId) {
+        return performWithExistingAndUnlockedAccount(
+                userId,
+                this::generatePasswordResetToken,
+                GeneratePaswordResetTokenResult.ACCOUNT_DOES_NOT_EXIST,
+                GeneratePaswordResetTokenResult.ACCOUNT_LOCKED
+        );
+    }
+
+    private GeneratePaswordResetTokenResult generatePasswordResetToken(User user) {
+        final PasswordResetToken token = PasswordResetToken.withDuration(user.getId(), 1, TimeUnit.HOURS);
+        tokenDao.savePasswordResetToken(token);
+        return GeneratePaswordResetTokenResult.forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
+    }
+
+    public ResetPasswordResult resetPassword(String passwordResetToken, String newPassword) {
+        return tokenDao.getPasswordResetToken(passwordResetToken)
+                .map(PasswordResetToken::getUserId)
+                .flatMap(userDao::getUserById)
+                .map(user -> {
+                    if (this.passwordConformsToRules(newPassword)) {
+                        user.setPassword(newPassword);
+                        userDao.saveUser(user);
+                        return ResetPasswordResult.SUCCESS;
+                    } else {
+                        return ResetPasswordResult.INVALID_PASSWORD;
+                    }
+                }).orElse(ResetPasswordResult.INVALID_TOKEN);
+    }
+
+
+    private boolean passwordConformsToRules(String newPassword) {
+        return true; // TODO: password strength policy
+    }
+
     public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
         return tokenDao
                 .getToken(token)
@@ -44,55 +97,39 @@ public class AuthenticationManager {
                 .orElseGet(CheckAuthenticationTokenResult::forInvalid);
     }
 
-    public RegistrationResult register(@Nullable  final String username, @Nullable final String email, final String rawPassword) {
+    public RegistrationResult register(@Nullable final String username, @Nullable final String email, final String rawPassword) {
         final var required = auth1.getAuth1Configuration().getRequiredUserFields();
 
-        if((required == USERNAME_ONLY || required == USERNAME_AND_EMAIL) && username == null) {
+        if ((required == USERNAME_ONLY || required == USERNAME_AND_EMAIL) && username == null) {
             return RegistrationResult.USERNAME_REQUIRED;
-        } else if((required == EMAIL_ONLY || required == USERNAME_AND_EMAIL) && email == null) {
+        } else if ((required == EMAIL_ONLY || required == USERNAME_AND_EMAIL) && email == null) {
             return RegistrationResult.EMAIL_REQUIRED;
         }
 
         final var password = auth1.getAuth1Configuration().getHashFunction().hash(rawPassword);
         final var newUser = new User(username, password, null, email, false, false, ZonedDateTime.now());
-        userDao.register(newUser);
+        userDao.saveUser(newUser);
         return auth1.getAuth1Configuration().isEmailVerificationRequired()
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
     }
 
-    public AuthenticationResult authenticateByUsername(final String username, final String rawPassword, final @Nullable String totpCode) {
-        return userDao
-                .getUserByUsername(username)
-                .map(user -> this.authenticate(user, rawPassword, totpCode))
-                .orElseGet(() -> AuthenticationResult.forResult(AuthenticationResult.ResultType.USERNAME_DOES_NOT_EXIST));
+    public AuthenticationResult authenticate(final UserIdentifier userId, final String rawPassword, final @Nullable String totpCode) {
+        return performWithExistingAndUnlockedAccount(userId,
+                user -> this.authenticate(user, rawPassword, totpCode),
+                AuthenticationResult.USER_DOES_NOT_EXIST,
+                AuthenticationResult.ACCOUNT_LOCKED);
     }
 
-    public AuthenticationResult authenticateByEmail(final String email, final String rawPassword, final @Nullable String totpCode) {
-        return userDao
-                .getUserByEmail(email)
-                .map(user -> this.authenticate(user, rawPassword, totpCode))
-                .orElseGet(() -> AuthenticationResult.forResult(AuthenticationResult.ResultType.EMAIL_DOES_NOT_EXIST));
-    }
-
-    public AuthenticationResult authenticateByUsernameOrEmail(final String usernameOrEmail, final String password, final @Nullable String totpCode) {
-        return userDao
-                .getUserByUsername(usernameOrEmail)
-                .or(() -> userDao.getUserByEmail(usernameOrEmail))
-                .map(user -> this.authenticate(user, password, totpCode))
-                .orElseGet(() -> AuthenticationResult.forResult(AuthenticationResult.ResultType.USERNAME_OR_EMAIL_DOES_NOT_EXIST));
-    }
-
-    private AuthenticationResult authenticate(final User user, final String password, final @Nullable String totpCode) {
+    private AuthenticationResult authenticate(final User user, final String rawPassword, final @Nullable String totpCode) {
         return steps.stream()
-                .map(step -> step.doStep(user, password, totpCode))
-                .filter(res -> !res.passed())
+                .map(step -> step.doStep(user, rawPassword, totpCode))
+                .filter(AuthenticationStepResult::failed)
                 .findFirst()
-                .orElse(stepPassed())
-                .getResult()
+                .flatMap(AuthenticationStepResult::getResult)
                 .orElseGet(() -> {
                     final UserAuthenticationToken token = UserAuthenticationToken.withDuration(user.getId(), 23, TimeUnit.HOURS);
                     tokenDao.saveLoginToken(token);
-                    return AuthenticationResult.forSuccess(new AuthenticationToken(token.getValue(), token.getExpirationTime()));
+                    return AuthenticationResult.forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
                 });
     }
 
@@ -104,7 +141,7 @@ public class AuthenticationManager {
             mgr -> mgr::checkTOTP);
 
     private AuthenticationStepResult checkLocked(User user, final String rawPassword, final @Nullable String totpCode) {
-        return !user.isLocked() ? stepPassed() : of(AuthenticationResult.forResult(AuthenticationResult.ResultType.ACCOUNT_LOCKED));
+        return !user.isLocked() ? stepPassed() : of(AuthenticationResult.ACCOUNT_LOCKED);
     }
 
     private AuthenticationStepResult checkRate(User user, final String rawPassword, final @Nullable String totpCode) {
@@ -113,12 +150,12 @@ public class AuthenticationManager {
 
     private AuthenticationStepResult checkVerified(User user, final String rawPassword, final @Nullable String totpCode) {
         final var notRequiredOrVerified = !auth1.getAuth1Configuration().isEmailVerificationRequired() || user.isVerified();
-        return notRequiredOrVerified ? stepPassed() : of(AuthenticationResult.forResult(AuthenticationResult.ResultType.NOT_VERIFIED));
+        return notRequiredOrVerified ? stepPassed() : of(AuthenticationResult.NOT_VERIFIED);
     }
 
     private AuthenticationStepResult checkPassword(User user, final String rawPassword, final @Nullable String totpCode) {
         final var match = this.auth1.getAuth1Configuration().getCheckFunction().check(rawPassword, user.getPassword());
-        return match ? stepPassed() : of(AuthenticationResult.forResult(AuthenticationResult.ResultType.BAD_PASSWORD));
+        return match ? stepPassed() : of(AuthenticationResult.BAD_PASSWORD);
     }
 
     private AuthenticationStepResult checkTOTP(User user, final String rawPassword, final @Nullable String totpCode) {

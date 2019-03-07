@@ -25,7 +25,7 @@ public class UserDaoImpl implements UserDao {
         return user.map(user1 -> user1.getPassword().equals(password)).orElse(false);
     }
 
-    public void register(final User user) {
+    public void saveUser(final User user) {
         final SessionFactory sessionFactory = databaseManager.getSessionFactory();
         final Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -54,6 +54,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public Optional<User> getUserById(int userId) {
+        throw new NotYetImplementedException();
+    }
+
+    @Override
     public Optional<User> getUserByUsername(String username) {
         return DBUtil.getFirstRow(databaseManager, User.class, "username", username);
     }
@@ -61,5 +66,10 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> getUserByEmail(String email) {
         return DBUtil.getFirstRow(databaseManager, User.class, "email", email);
+    }
+
+    @Override
+    public Optional<User> getUserByUsernameOrEmail(String usernameOrEmail) {
+        return this.getUserByUsername(usernameOrEmail).or(() -> this.getUserByEmail(usernameOrEmail));
     }
 }

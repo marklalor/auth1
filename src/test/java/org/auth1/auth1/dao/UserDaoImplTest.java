@@ -61,7 +61,7 @@ class UserDaoImplTest {
 
     @Test
     void register() throws SQLException {
-        userDao.register(exampleUser);
+        userDao.saveUser(exampleUser);
         final MysqlDataSource dataSource = DatabaseLoader.getMySqlDataSource();
         try (Connection conn = dataSource.getConnection()) {
             Statement stmt = conn.createStatement();
@@ -81,13 +81,13 @@ class UserDaoImplTest {
 
     @Test
     void login_correctCredentials() {
-        userDao.register(exampleUser);
+        userDao.saveUser(exampleUser);
         assertTrue(userDao.login(username, password));
     }
 
     @Test
     void login_incorrectCredentials() {
-        userDao.register(exampleUser);
+        userDao.saveUser(exampleUser);
         assertFalse(userDao.login(username, incorrectPassword));
     }
 
@@ -98,7 +98,7 @@ class UserDaoImplTest {
 
     @Test
     void getUserByUsername_exists() {
-        userDao.register(exampleUser);
+        userDao.saveUser(exampleUser);
         final Optional<User> user = userDao.getUserByUsername(username);
         assertTrue(user.isPresent());
         assertEquals(exampleUser, user.get());
@@ -111,7 +111,7 @@ class UserDaoImplTest {
 
     @Test
     void getUserByEmail_exists() {
-        userDao.register(exampleUser);
+        userDao.saveUser(exampleUser);
         final Optional<User> user = userDao.getUserByEmail(email);
         assertTrue(user.isPresent());
         assertEquals(exampleUser, user.get());

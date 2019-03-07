@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface UserDao {
     boolean login(final String username, final String password);
 
-    void register(final User user);
+    void saveUser(final User user);
 
     void setPasswordResetToken(final String username, final String passwordResetToken);
 
@@ -17,7 +17,14 @@ public interface UserDao {
 
     void resetPassword(final String username, final String password);
 
+
+    Optional<User> getUserById(final int userId);
+
     Optional<User> getUserByUsername(final String username);
 
     Optional<User> getUserByEmail(final String email);
+
+    Optional<User> getUserByUsernameOrEmail(final String usernameOrEmail);
+
+
 }

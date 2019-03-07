@@ -1,6 +1,6 @@
 package org.auth1.auth1.dao;
 
-import org.auth1.auth1.core.authentication.AuthenticationToken;
+import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
 
 import java.util.Optional;
@@ -9,5 +9,9 @@ public interface TokenDao {
 
     void saveLoginToken(final UserAuthenticationToken token);
 
+    void savePasswordResetToken(final PasswordResetToken token);
+
     Optional<UserAuthenticationToken> getToken(String token);
+
+    Optional<PasswordResetToken> getPasswordResetToken(String token);
 }

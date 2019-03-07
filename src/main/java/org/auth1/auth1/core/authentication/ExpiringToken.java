@@ -2,11 +2,11 @@ package org.auth1.auth1.core.authentication;
 
 import java.time.ZonedDateTime;
 
-public class AuthenticationToken {
+public class ExpiringToken {
     private final String tokenValue;
     private final ZonedDateTime expirationTime;
 
-    public AuthenticationToken(String tokenValue, ZonedDateTime expirationTime) {
+    public ExpiringToken(String tokenValue, ZonedDateTime expirationTime) {
         this.tokenValue = tokenValue;
         this.expirationTime = expirationTime;
     }

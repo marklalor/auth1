@@ -1,5 +1,6 @@
 package org.auth1.auth1.model.entities;
 
+import org.auth1.auth1.core.authentication.AuthenticationUtils;
 import org.springframework.util.Base64Utils;
 
 import javax.persistence.*;
@@ -24,12 +25,9 @@ public class UserAuthenticationToken extends UserToken {
     }
 
     public static UserAuthenticationToken withDuration(int userId, long time, TimeUnit unit) {
-        ZonedDateTime issueTime = ZonedDateTime.now();
-        ZonedDateTime expirationTime = issueTime.plusSeconds(unit.toSeconds(time));
-        SecureRandom random = new SecureRandom();
-        final byte[] bytes = new byte[128];
-        random.nextBytes(bytes);
-        final String value = Base64Utils.encodeToString(bytes);
+        final ZonedDateTime issueTime = ZonedDateTime.now();
+        final ZonedDateTime expirationTime = issueTime.plusSeconds(unit.toSeconds(time));
+        final String value = AuthenticationUtils.generateToken(128, Base64Utils::encodeToString);
         return new UserAuthenticationToken(value, userId, issueTime, expirationTime, null, null);
     }
 
