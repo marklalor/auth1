@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.ExpiringToken;
+import org.auth1.auth1.core.authentication.UserIdentifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,14 +54,12 @@ public class LoginTest {
     @Test
     public void loginWithoutTotp() throws Exception {
         AuthenticationResult loginResult = AuthenticationResult.forSuccess(VALID_TOKEN);
-        when(this.authenticationManager.authenticateByEmail(VALID_EMAIL, VALID_PASSWORD, null))
-                .thenReturn(loginResult);
-        when(this.authenticationManager.authenticateByUsername(VALID_USERNAME, VALID_PASSWORD, null))
-                .thenReturn(loginResult);
-        when(this.authenticationManager.authenticateByUsernameOrEmail(VALID_EMAIL, VALID_PASSWORD, null))
-                .thenReturn(loginResult);
-        when(this.authenticationManager.authenticateByUsernameOrEmail(VALID_USERNAME, VALID_PASSWORD, null))
-                .thenReturn(loginResult);
+        when(this.authenticationManager.authenticate(UserIdentifier.forEmail(VALID_EMAIL),
+                VALID_PASSWORD,null)).thenReturn(loginResult);
+        when(this.authenticationManager.authenticate(UserIdentifier.forUsername(VALID_USERNAME),
+                VALID_PASSWORD,null)).thenReturn(loginResult);
+        when(this.authenticationManager.authenticate(UserIdentifier.forUsernameOrEmail(VALID_EMAIL),
+                VALID_PASSWORD,null)).thenReturn(loginResult);
 
         LoginResponse expected = LoginResponse.fromAuthenticationResult(loginResult);
 
@@ -115,8 +114,8 @@ public class LoginTest {
 
     @Test
     public void loginWithFailedAuth() throws Exception {
-        AuthenticationResult loginResult = AuthenticationResult.forResult(AuthenticationResult.ResultType.BAD_PASSWORD);
-        when(this.authenticationManager.authenticateByEmail(VALID_EMAIL, INVALID_PASSWORD, null))
+        AuthenticationResult loginResult = AuthenticationResult.BAD_PASSWORD;
+        when(this.authenticationManager.authenticate(UserIdentifier.forEmail(VALID_EMAIL), INVALID_PASSWORD, null))
                 .thenReturn(loginResult);
 
         LoginResponse expected = LoginResponse.fromAuthenticationResult(loginResult);

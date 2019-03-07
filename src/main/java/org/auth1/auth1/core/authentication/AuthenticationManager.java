@@ -1,11 +1,11 @@
 package org.auth1.auth1.core.authentication;
 
-import org.auth1.auth1.core.Auth1;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
+import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.entities.PasswordResetToken;
-import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.auth1.auth1.model.entities.User;
+import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -23,13 +23,13 @@ import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.*;
 
 @Component
 public class AuthenticationManager {
-    private final Auth1 auth1;
+    private final Auth1Configuration config;
     private final UserDao userDao;
     private final TokenDao tokenDao;
     private final List<AuthenticationStep> steps;
 
-    public AuthenticationManager(Auth1 auth1, UserDao userDao, TokenDao tokenDao) {
-        this.auth1 = auth1;
+    public AuthenticationManager(Auth1Configuration config, UserDao userDao, TokenDao tokenDao) {
+        this.config = config;
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.steps = StreamSupport.stream(STEPS.spliterator(), false)
@@ -98,7 +98,7 @@ public class AuthenticationManager {
     }
 
     public RegistrationResult register(@Nullable final String username, @Nullable final String email, final String rawPassword) {
-        final var required = auth1.getAuth1Configuration().getRequiredUserFields();
+        final var required = this.config.getRequiredUserFields();
 
         if ((required == USERNAME_ONLY || required == USERNAME_AND_EMAIL) && username == null) {
             return RegistrationResult.USERNAME_REQUIRED;
@@ -106,10 +106,10 @@ public class AuthenticationManager {
             return RegistrationResult.EMAIL_REQUIRED;
         }
 
-        final var password = auth1.getAuth1Configuration().getHashFunction().hash(rawPassword);
+        final var password = this.config.getHashFunction().hash(rawPassword);
         final var newUser = new User(username, password, null, email, false, false, ZonedDateTime.now());
         userDao.saveUser(newUser);
-        return auth1.getAuth1Configuration().isEmailVerificationRequired()
+        return this.config.isEmailVerificationRequired()
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
     }
 
@@ -149,12 +149,12 @@ public class AuthenticationManager {
     }
 
     private AuthenticationStepResult checkVerified(User user, final String rawPassword, final @Nullable String totpCode) {
-        final var notRequiredOrVerified = !auth1.getAuth1Configuration().isEmailVerificationRequired() || user.isVerified();
+        final var notRequiredOrVerified = !this.config.isEmailVerificationRequired() || user.isVerified();
         return notRequiredOrVerified ? stepPassed() : of(AuthenticationResult.NOT_VERIFIED);
     }
 
     private AuthenticationStepResult checkPassword(User user, final String rawPassword, final @Nullable String totpCode) {
-        final var match = this.auth1.getAuth1Configuration().getCheckFunction().check(rawPassword, user.getPassword());
+        final var match = this.config.getCheckFunction().check(rawPassword, user.getPassword());
         return match ? stepPassed() : of(AuthenticationResult.BAD_PASSWORD);
     }
 

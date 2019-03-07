@@ -30,11 +30,10 @@ public class AuthenticationController {
         if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() > 1) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            final UserIdentifier userId = new UserIdentifier(username, email, usernameOrEmail);
+            final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
             final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode);
             return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
         }
-
     }
 
     @RequestMapping(value = "/checkAuthToken", method = RequestMethod.POST)

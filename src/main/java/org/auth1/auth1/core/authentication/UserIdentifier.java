@@ -18,9 +18,21 @@ public class UserIdentifier {
     private final Type type;
     private final String value;
 
-    public UserIdentifier(Type type, String value) {
+    private UserIdentifier(Type type, String value) {
         this.type = type;
         this.value = value;
+    }
+
+    public static UserIdentifier forEmail(String email) {
+        return new UserIdentifier(Type.EMAIL, email);
+    }
+
+    public static UserIdentifier forUsername(String username) {
+        return new UserIdentifier(Type.USERNAME, username);
+    }
+
+    public static UserIdentifier forUsernameOrEmail(String usernameOrEmail) {
+        return new UserIdentifier(Type.USERNAME_OR_EMAIL, usernameOrEmail);
     }
 
     /**
@@ -33,20 +45,17 @@ public class UserIdentifier {
      * @throws {@link IllegalArgumentException} if more than one parameter is non-null since
      * the semantics of the return value would be otherwise confusing.
      */
-    public UserIdentifier(@Nullable String username, @Nullable String email, @Nullable String usernameOrEmail) {
+    public static UserIdentifier forOneOf(@Nullable String username, @Nullable String email, @Nullable String usernameOrEmail) {
         if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() > 1) {
             throw new IllegalArgumentException("Only one of username, email, or usernameOrEmail may be non-null.");
         }
 
-        if (username != null) {
-            this.type = Type.USERNAME;
-            this.value = username;
-        } else if (email != null) {
-            this.type = Type.EMAIL;
-            this.value = email;
+        if (email != null) {
+            return UserIdentifier.forEmail(email);
+        } else if (username != null) {
+            return UserIdentifier.forUsername(username);
         } else {
-            this.type = Type.USERNAME_OR_EMAIL;
-            this.value = usernameOrEmail;
+            return UserIdentifier.forUsernameOrEmail(usernameOrEmail);
         }
     }
 
@@ -69,5 +78,19 @@ public class UserIdentifier {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserIdentifier that = (UserIdentifier) o;
+        return type == that.type &&
+                com.google.common.base.Objects.equal(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return com.google.common.base.Objects.hashCode(type, value);
     }
 }
