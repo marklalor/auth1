@@ -74,10 +74,12 @@ public class UserDaoImpl implements UserDao {
     private Optional<User> getUserByColumnValue(String columnName, Object columnValue) {
         final SessionFactory sessionFactory = databaseManager.getSessionFactory();
         final Session session = sessionFactory.openSession();
+        session.beginTransaction();
         final String placeHolder = "placeholder";
         final Object obj = session.createQuery(String.format("FROM User u WHERE u.%s = :%s", columnName, placeHolder))
                 .setParameter(placeHolder, columnValue)
                 .uniqueResult();
+        session.getTransaction().commit();
         if(obj instanceof User)
             return Optional.of((User)obj);
         else

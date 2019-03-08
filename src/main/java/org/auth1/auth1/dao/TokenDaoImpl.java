@@ -35,16 +35,20 @@ public class TokenDaoImpl implements TokenDao {
     public void logout(UserAuthenticationToken token) {
         final SessionFactory sessionFactory = databaseManager.getSessionFactory();
         final Session session = sessionFactory.openSession();
+        session.beginTransaction();
         session.delete(token);
+        session.getTransaction().commit();
     }
 
     @Override
     public Optional<UserAuthenticationToken> getAuthToken(String token) {
         final SessionFactory sessionFactory = databaseManager.getSessionFactory();
         final Session session = sessionFactory.openSession();
+        session.beginTransaction();
         final Object obj = session.createQuery("FROM UserAuthenticationToken u WHERE u.value = :value")
                 .setParameter("value", token)
                 .uniqueResult();
+        session.getTransaction().commit();
         if(obj instanceof UserAuthenticationToken)
             return Optional.of((UserAuthenticationToken) obj);
         else
@@ -55,9 +59,11 @@ public class TokenDaoImpl implements TokenDao {
     public Optional<PasswordResetToken> getPasswordResetToken(String token) {
         final SessionFactory sessionFactory = databaseManager.getSessionFactory();
         final Session session = sessionFactory.openSession();
+        session.beginTransaction();
         final Object obj = session.createQuery("FROM PasswordResetToken u WHERE u.value = :value")
                 .setParameter("value", token)
                 .uniqueResult();
+        session.getTransaction().commit();
         if(obj instanceof PasswordResetToken)
             return Optional.of((PasswordResetToken) obj);
         else
