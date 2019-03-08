@@ -1,14 +1,11 @@
 package org.auth1.auth1.core.authentication;
 
-import org.auth1.auth1.dao.TokenDao;
-import org.auth1.auth1.dao.UserDao;
-import org.auth1.auth1.model.Auth1Configuration;
-import org.auth1.auth1.model.entities.PasswordResetToken;
-import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.model.entities.UserAuthenticationToken;
-import org.springframework.stereotype.Component;
+import static org.auth1.auth1.core.authentication.AuthenticationStepResult.of;
+import static org.auth1.auth1.core.authentication.AuthenticationStepResult.stepPassed;
+import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.EMAIL_ONLY;
+import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.USERNAME_AND_EMAIL;
+import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.USERNAME_ONLY;
 
-import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -16,10 +13,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static org.auth1.auth1.core.authentication.AuthenticationStepResult.of;
-import static org.auth1.auth1.core.authentication.AuthenticationStepResult.stepPassed;
-import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.*;
+import javax.annotation.Nullable;
+import org.auth1.auth1.dao.TokenDao;
+import org.auth1.auth1.dao.UserDao;
+import org.auth1.auth1.model.Auth1Configuration;
+import org.auth1.auth1.model.entities.PasswordResetToken;
+import org.auth1.auth1.model.entities.User;
+import org.auth1.auth1.model.entities.UserAuthenticationToken;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AuthenticationManager {
@@ -54,19 +55,20 @@ public class AuthenticationManager {
                 .orElse(accountDoesNotExistResult);
     }
 
-    public GeneratePaswordResetTokenResult generatePasswordResetToken(UserIdentifier userId) {
+  public GeneratePasswordResetTokenResult generatePasswordResetToken(UserIdentifier userId) {
         return performWithExistingAndUnlockedAccount(
                 userId,
                 this::generatePasswordResetToken,
-                GeneratePaswordResetTokenResult.ACCOUNT_DOES_NOT_EXIST,
-                GeneratePaswordResetTokenResult.ACCOUNT_LOCKED
+            GeneratePasswordResetTokenResult.ACCOUNT_DOES_NOT_EXIST,
+            GeneratePasswordResetTokenResult.ACCOUNT_LOCKED
         );
     }
 
-    private GeneratePaswordResetTokenResult generatePasswordResetToken(User user) {
+  private GeneratePasswordResetTokenResult generatePasswordResetToken(User user) {
         final PasswordResetToken token = PasswordResetToken.withDuration(user.getId(), 1, TimeUnit.HOURS);
         tokenDao.savePasswordResetToken(token);
-        return GeneratePaswordResetTokenResult.forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
+    return GeneratePasswordResetTokenResult
+        .forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
     }
 
     public ResetPasswordResult resetPassword(String passwordResetToken, String newPassword) {
