@@ -75,7 +75,7 @@ public class AuthenticationManager {
                 .flatMap(userDao::getUserById)
                 .map(user -> {
                     if (this.passwordConformsToRules(newPassword)) {
-                        user.setPassword(newPassword);
+                        user.setPassword(this.config.getHashFunction().hash(newPassword));
                         userDao.saveUser(user);
                         return ResetPasswordResult.SUCCESS;
                     } else {

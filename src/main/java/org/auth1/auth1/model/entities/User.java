@@ -100,4 +100,18 @@ public class User {
     public int hashCode() {
         return Objects.hash(username, password, email, verified, locked);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", totpSecret=" + Arrays.toString(totpSecret) +
+                ", email='" + email + '\'' +
+                ", verified=" + verified +
+                ", locked=" + locked +
+                ", creationTime=" + creationTime +
+                '}';
+    }
 }

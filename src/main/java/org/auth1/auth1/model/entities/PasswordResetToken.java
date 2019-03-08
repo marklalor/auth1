@@ -19,7 +19,7 @@ public class PasswordResetToken extends UserToken {
     public static PasswordResetToken withDuration(int userId, long time, TimeUnit unit) {
         final ZonedDateTime issueTime = ZonedDateTime.now();
         final ZonedDateTime expirationTime = issueTime.plusSeconds(unit.toSeconds(time));
-        final String value = AuthenticationUtils.generateToken(128, Base64Utils::encodeToString);
+        final String value = AuthenticationUtils.generateToken(16, Base64Utils::encodeToString);
         return new PasswordResetToken(value, userId, issueTime, expirationTime);
     }
 }

@@ -23,14 +23,14 @@ public class Auth1Configuration {
     public HashFunction getHashFunction() {
         return this.getHashAlgorithm() == HashAlgorithm.BCRYPT ?
                 rawPassword -> BCrypt.hashpw(rawPassword, BCrypt.gensalt(this.bcryptCost)) :
-                rawPassword -> new SCryptPasswordEncoder(this.scryptCost, this.scryptBlockSize,
+                rawPassword -> new SCryptPasswordEncoder((int) Math.pow(2, this.scryptCost), this.scryptBlockSize,
                         this.scryptParallelization, 32,64).encode(rawPassword);
     }
 
     public CheckFunction getCheckFunction() {
         return this.getHashAlgorithm() == HashAlgorithm.BCRYPT ?
                 (plaintext, hashed) -> BCrypt.checkpw(plaintext, hashed) :
-                (plaintext, hashed) -> new SCryptPasswordEncoder(this.scryptCost, this.scryptBlockSize,
+                (plaintext, hashed) -> new SCryptPasswordEncoder((int) Math.pow(2, this.scryptCost), this.scryptBlockSize,
                         this.scryptParallelization, 32,64).matches(plaintext, hashed);
     }
 
