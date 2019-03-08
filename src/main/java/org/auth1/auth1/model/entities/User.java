@@ -2,11 +2,11 @@ package org.auth1.auth1.model.entities;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User",
+indexes = {@Index(name="user_username", columnList = "username", unique = true)})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

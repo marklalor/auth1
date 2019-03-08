@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS `User` (
 	PRIMARY KEY (`id`)
 );
 
+CREATE INDEX user_username
+	ON `User` (`username`);
+
 CREATE TABLE IF NOT EXISTS `LoginRecord` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`time` DATETIME NOT NULL,

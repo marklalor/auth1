@@ -2,6 +2,7 @@ package org.auth1.auth1.dao;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.auth1.auth1.database.DatabaseLoader;
+import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
 import org.junit.jupiter.api.*;
@@ -15,14 +16,14 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserDaoImplTest {
 
     private static final String username = "user";
     private static final String password = "pass";
+    private static final String altPassword = "altPass";
     private static final String incorrectPassword = "badpass";
     private static final byte[] totpSecret = new byte[128];
     private static final String email = "email@email.co";
@@ -80,23 +81,6 @@ class UserDaoImplTest {
     }
 
     @Test
-    void login_correctCredentials() {
-        userDao.saveUser(exampleUser);
-        assertTrue(userDao.login(username, password));
-    }
-
-    @Test
-    void login_incorrectCredentials() {
-        userDao.saveUser(exampleUser);
-        assertFalse(userDao.login(username, incorrectPassword));
-    }
-
-    @Test
-    void login_nonexistentCredentials() {
-        assertFalse(userDao.login(username, password));
-    }
-
-    @Test
     void getUserByUsername_exists() {
         userDao.saveUser(exampleUser);
         final Optional<User> user = userDao.getUserByUsername(username);
@@ -120,5 +104,23 @@ class UserDaoImplTest {
     @Test
     void getUserByEmail_notExists() {
         assertTrue(userDao.getUserByEmail(email).isEmpty());
+    }
+
+    @Test
+    void resetPassword_userExists() throws Exception {
+        userDao.saveUser(exampleUser);
+        Optional<User> res = userDao.getUserByUsername(exampleUser.getUsername());
+        assertTrue(res.isPresent());
+        assertEquals(password, res.get().getPassword());
+
+        userDao.resetPassword(exampleUser.getUsername(), altPassword);
+        res = userDao.getUserByUsername(exampleUser.getUsername());
+        assertTrue(res.isPresent());
+        assertEquals(altPassword, res.get().getPassword());
+    }
+
+    @Test
+    void resetPassword_userDoesNotExist() {
+        assertThrows(UserDoesNotExistException.class, () -> userDao.resetPassword(exampleUser.getUsername(), altPassword));
     }
 }

@@ -1,8 +1,9 @@
 package org.auth1.auth1.dao;
 
+import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.util.DBUtil;
+import org.auth1.auth1.util.DBUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.NotYetImplementedException;
@@ -20,17 +21,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public boolean login(String username, String password) {
-        Optional<User> user = getUserByUsername(username);
-        return user.map(user1 -> user1.getPassword().equals(password)).orElse(false);
-    }
-
     public void saveUser(final User user) {
-        final SessionFactory sessionFactory = databaseManager.getSessionFactory();
-        final Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(user);
-        session.getTransaction().commit();
+        DBUtils.saveEntity(databaseManager, user);
     }
 
     @Override
@@ -49,23 +41,46 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void resetPassword(String username, String password) {
-        throw new NotYetImplementedException();
+    public void resetPassword(String username, String password) throws UserDoesNotExistException {
+        final Optional<User> res = getUserByUsername(username);
+        if (res.isPresent()){
+            final User user = res.get();
+            user.setPassword(password);
+            final SessionFactory sessionFactory = databaseManager.getSessionFactory();
+            final Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.saveOrUpdate(user);
+            session.getTransaction().commit();
+        } else
+            throw new UserDoesNotExistException(username);
     }
 
     @Override
     public Optional<User> getUserById(int userId) {
-        throw new NotYetImplementedException();
+        return getUserByColumnValue("id", userId);
     }
 
     @Override
     public Optional<User> getUserByUsername(String username) {
-        return DBUtil.getFirstRow(databaseManager, User.class, "username", username);
+        return getUserByColumnValue("username", username);
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        return DBUtil.getFirstRow(databaseManager, User.class, "email", email);
+        return getUserByColumnValue("email", email);
+    }
+
+    private Optional<User> getUserByColumnValue(String columnName, Object columnValue) {
+        final SessionFactory sessionFactory = databaseManager.getSessionFactory();
+        final Session session = sessionFactory.openSession();
+        final String placeHolder = "placeholder";
+        final Object obj = session.createQuery(String.format("FROM User u WHERE u.%s = :%s", columnName, placeHolder))
+                .setParameter(placeHolder, columnValue)
+                .uniqueResult();
+        if(obj instanceof User)
+            return Optional.of((User)obj);
+        else
+            return Optional.empty();
     }
 
     @Override
