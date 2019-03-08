@@ -93,7 +93,7 @@ public class AuthenticationManager {
 
     public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
         return tokenDao
-                .getToken(token)
+                .getAuthToken(token)
                 .map(UserAuthenticationToken::getUserId)
                 .map(CheckAuthenticationTokenResult::forSuccess)
                 .orElseGet(CheckAuthenticationTokenResult::forInvalid);

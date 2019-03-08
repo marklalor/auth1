@@ -5,8 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "User",
-indexes = {@Index(name="user_username", columnList = "username", unique = true)})
+@Table(name = "User")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
