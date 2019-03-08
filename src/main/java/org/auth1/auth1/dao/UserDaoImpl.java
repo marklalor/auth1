@@ -1,5 +1,6 @@
 package org.auth1.auth1.dao;
 
+import org.auth1.auth1.core.authentication.UserIdentifier;
 import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
@@ -26,23 +27,23 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void setPasswordResetToken(String username, String passwordResetToken) {
+    public void setPasswordResetToken(UserIdentifier userIdentifier, String passwordResetToken) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void lockUser(String username) {
+    public void lockUser(UserIdentifier userIdentifier) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void unlockUser(String username) {
+    public void unlockUser(UserIdentifier userIdentifier) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void resetPassword(String username, String password) throws UserDoesNotExistException {
-        final Optional<User> res = getUserByUsername(username);
+    public void resetPassword(UserIdentifier userIdentifier, String password) throws UserDoesNotExistException {
+        final Optional<User> res = userIdentifier.getUser(this);
         if (res.isPresent()){
             final User user = res.get();
             user.setPassword(password);
@@ -52,7 +53,7 @@ public class UserDaoImpl implements UserDao {
             session.saveOrUpdate(user);
             session.getTransaction().commit();
         } else
-            throw new UserDoesNotExistException(username);
+            throw new UserDoesNotExistException(userIdentifier.getValue());
     }
 
     @Override

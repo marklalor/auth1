@@ -1,6 +1,7 @@
 package org.auth1.auth1.dao;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import org.auth1.auth1.core.authentication.UserIdentifier;
 import org.auth1.auth1.database.DatabaseLoader;
 import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.DatabaseManager;
@@ -15,7 +16,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,7 +24,6 @@ class UserDaoImplTest {
     private static final String username = "user";
     private static final String password = "pass";
     private static final String altPassword = "altPass";
-    private static final String incorrectPassword = "badpass";
     private static final byte[] totpSecret = new byte[128];
     private static final String email = "email@email.co";
     private static final boolean verified = false;
@@ -113,7 +112,7 @@ class UserDaoImplTest {
         assertTrue(res.isPresent());
         assertEquals(password, res.get().getPassword());
 
-        userDao.resetPassword(exampleUser.getUsername(), altPassword);
+        userDao.resetPassword(UserIdentifier.forUsername(exampleUser.getUsername()), altPassword);
         res = userDao.getUserByUsername(exampleUser.getUsername());
         assertTrue(res.isPresent());
         assertEquals(altPassword, res.get().getPassword());
@@ -121,6 +120,6 @@ class UserDaoImplTest {
 
     @Test
     void resetPassword_userDoesNotExist() {
-        assertThrows(UserDoesNotExistException.class, () -> userDao.resetPassword(exampleUser.getUsername(), altPassword));
+        assertThrows(UserDoesNotExistException.class, () -> userDao.resetPassword(UserIdentifier.forUsername(exampleUser.getUsername()), altPassword));
     }
 }
