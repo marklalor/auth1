@@ -20,6 +20,10 @@ public class UserToken {
     @Column(name = "expiration_time")
     private ZonedDateTime expirationTime;
 
+    public UserToken() {
+
+    }
+
     public UserToken(String value, int userId, ZonedDateTime issueTime, ZonedDateTime expirationTime) {
         this.value = value;
         this.userId = userId;
