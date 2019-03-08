@@ -1,5 +1,7 @@
 package org.auth1.auth1.dao;
 
+import org.auth1.auth1.core.authentication.UserIdentifier;
+import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.entities.User;
 import org.hibernate.cfg.NotYetImplementedException;
 
@@ -7,32 +9,27 @@ import java.util.Optional;
 
 public abstract class UnimplementedUserDao implements UserDao {
     @Override
-    public boolean login(String username, String password) {
-        throw new NotYetImplementedException();
-    }
-
-    @Override
     public void saveUser(User user) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void setPasswordResetToken(String username, String passwordResetToken) {
+    public void setPasswordResetToken(UserIdentifier userIdentifier, String passwordResetToken) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void lockUser(String username) {
+    public void lockUser(UserIdentifier userIdentifier) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void unlockUser(String username) {
+    public void unlockUser(UserIdentifier userIdentifier) {
         throw new NotYetImplementedException();
     }
 
     @Override
-    public void resetPassword(String username, String password) {
+    public void resetPassword(UserIdentifier userIdentifier, String password) throws UserDoesNotExistException {
         throw new NotYetImplementedException();
     }
 

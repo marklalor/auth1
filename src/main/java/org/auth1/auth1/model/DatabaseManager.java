@@ -34,6 +34,7 @@ public class DatabaseManager {
         hibernateConfiguration.addAnnotatedClass(User.class);
         hibernateConfiguration.addAnnotatedClass(UserToken.class);
         hibernateConfiguration.addAnnotatedClass(UserVerificationToken.class);
+        hibernateConfiguration.addAnnotatedClass(UserAuthenticationToken.class);
 
         return hibernateConfiguration.buildSessionFactory();
     }

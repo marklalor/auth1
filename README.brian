@@ -1,3 +1,6 @@
+3/8/19:
+- I added a reset password method to the UserDAO + an integration test for it
+
 3/1/19:
 - I added a fetch user/login method to the UserDAO
 - I added integration tests for fetch user/login, for multiple cases

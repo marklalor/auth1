@@ -11,7 +11,9 @@ public interface TokenDao {
 
     void savePasswordResetToken(final PasswordResetToken token);
 
-    Optional<UserAuthenticationToken> getToken(String token);
+    void logout(final UserAuthenticationToken token);
+
+    Optional<UserAuthenticationToken> getAuthToken(String token);
 
     Optional<PasswordResetToken> getPasswordResetToken(String token);
 }

@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `LoginRecord` (
 CREATE TABLE IF NOT EXISTS `UserAuthenticationToken` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`user_id` INT NOT NULL,
+	`value` VARCHAR(255) NOT NULL,
 	`issue_time` DATETIME NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
 	`issued_ip` VARCHAR(255) DEFAULT NULL,
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `UserAuthenticationToken` (
 CREATE TABLE IF NOT EXISTS `UserVerificationToken` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`user_id` INT NOT NULL,
+	`value` VARCHAR(255) NOT NULL,
 	`issue_time` DATETIME NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
@@ -44,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `UserVerificationToken` (
 CREATE TABLE IF NOT EXISTS `PasswordResetToken` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`user_id` INT NOT NULL,
+	`value` VARCHAR(255) NOT NULL,
 	`issue_time` DATETIME NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
@@ -53,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `PasswordResetToken` (
 CREATE TABLE IF NOT EXISTS `PasswordlessLoginToken` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`user_id` INT NOT NULL,
+	`value` VARCHAR(255) NOT NULL,
 	`issue_time` DATETIME NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),

@@ -18,7 +18,12 @@ public abstract class UnimplementedTokenDao implements TokenDao {
     }
 
     @Override
-    public Optional<UserAuthenticationToken> getToken(String token) {
+    public void logout(UserAuthenticationToken token) {
+        throw new NotYetImplementedException();
+    }
+
+    @Override
+    public Optional<UserAuthenticationToken> getAuthToken(String token) {
         throw new NotYetImplementedException();
     }
 
