@@ -27,7 +27,6 @@ class TokenDaoImplTest {
 
     private DatabaseLoader databaseLoader;
     private TokenDao tokenDao;
-    private UserDao userDao;
 
     @BeforeAll
     void setUp() throws Exception {
@@ -36,7 +35,8 @@ class TokenDaoImplTest {
 
         final DatabaseManager databaseManager = new DatabaseManager(DatabaseLoader.getDatabaseConfiguration());
         tokenDao = new TokenDaoImpl(databaseManager);
-        userDao = new UserDaoImpl(databaseManager);
+        final UserDao userDao = new UserDaoImpl(databaseManager);
+        userDao.saveUser(ExampleUser.INSTANCE);
     }
 
     @AfterAll
@@ -45,7 +45,7 @@ class TokenDaoImplTest {
     }
 
     @BeforeEach
-    void deleteUserTable() throws SQLException {
+    void deleteUserAuthenticationTable() throws SQLException {
         final MysqlDataSource dataSource = DatabaseLoader.getMySqlDataSource();
         try (Connection conn = dataSource.getConnection()) {
             Statement stmt = conn.createStatement();
@@ -55,7 +55,6 @@ class TokenDaoImplTest {
 
     @Test
     void saveLoginToken() throws SQLException {
-        userDao.saveUser(ExampleUser.INSTANCE);
         final UserAuthenticationToken exampleToken = ExampleUserAuthenticationToken.INSTANCE;
         tokenDao.saveLoginToken(exampleToken);
         final MysqlDataSource dataSource = DatabaseLoader.getMySqlDataSource();
@@ -76,12 +75,14 @@ class TokenDaoImplTest {
 
     @Test
     void logout() {
-        userDao.saveUser(ExampleUser.INSTANCE);
         final UserAuthenticationToken exampleToken = ExampleUserAuthenticationToken.INSTANCE;
         tokenDao.saveLoginToken(exampleToken);
-        final Optional<UserAuthenticationToken> res = tokenDao.getAuthToken(ExampleUserAuthenticationToken.VALUE);
+
+        Optional<UserAuthenticationToken> res = tokenDao.getAuthToken(ExampleUserAuthenticationToken.VALUE);
         assertTrue(res.isPresent());
-        tokenDao.logout(exampleToken);
+
+        tokenDao.logout(res.get());
+        res = tokenDao.getAuthToken(ExampleUserAuthenticationToken.VALUE);
         assertTrue(res.isEmpty());
     }
 

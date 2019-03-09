@@ -18,6 +18,10 @@ public class UserAuthenticationToken extends UserToken {
     @Column(name = "issued_user_agent")
     private String issuedUserAgent;
 
+    public UserAuthenticationToken() {
+        super();
+    }
+
     public UserAuthenticationToken(String value, int userId, ZonedDateTime issueTime, ZonedDateTime expirationTime, String issuedIp, String issuedUserAgent) {
         super(value, userId, issueTime, expirationTime);
         this.issuedIp = issuedIp;
