@@ -26,8 +26,8 @@ public class GeneratePasswordResetTokenResult extends
     return new GeneratePasswordResetTokenResult(ResultType.SUCCESS_ALREADY_SENT, token);
   }
 
+  @Nullable
   public ExpiringToken getPasswordResetToken() {
-    requireAny(ResultType.SUCCESS, ResultType.SUCCESS_ALREADY_SENT);
     return passwordResetToken;
   }
 
