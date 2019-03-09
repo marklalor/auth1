@@ -1,5 +1,7 @@
 package org.auth1.auth1.api.login;
 
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.CheckAuthenticationTokenResult;
@@ -11,10 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @RestController
 public class AuthenticationController {

@@ -1,5 +1,11 @@
 package org.auth1.auth1.api.register;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.RegistrationResult;
@@ -15,10 +21,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.mockito.BDDMockito.*;
-
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = RegisterController.class)
@@ -33,7 +35,7 @@ public class RegisterControllerTest {
 
     private JacksonTester<RegistrationResponse> json;
 
-    private final String ENDPOINT = "/saveUser";
+    private final String ENDPOINT = "/register";
 
     private final String VALID_USERNAME = "username";
     private final String VALID_EMAIL = "user@email.com";
