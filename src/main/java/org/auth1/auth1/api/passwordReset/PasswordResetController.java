@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.GeneratePasswordResetTokenResult;
+import org.auth1.auth1.core.authentication.ResetPasswordResult;
 import org.auth1.auth1.core.authentication.UserIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,17 @@ public class PasswordResetController {
 
   @Autowired
   AuthenticationManager authenticationManager;
+
+  @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+  public ResponseEntity<ResetPasswordResponse> resetPassword(
+      @RequestParam(value = "token", required = true) String token,
+      @RequestParam(value = "newPassword", required = true) String password
+  ) {
+    ResetPasswordResult result = authenticationManager.resetPassword(token, password);
+    ResetPasswordResponse response = ResetPasswordResponse.fromResult(result);
+
+    return ResponseEntity.ok(response);
+  }
 
   @RequestMapping(value = "/getPasswordResetToken", method = RequestMethod.POST)
   public ResponseEntity<GetPasswordResetTokenResponse> getPasswordResetToken(
