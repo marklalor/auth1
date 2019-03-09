@@ -19,3 +19,8 @@ IntelliJ but managed to find workarounds for everything in the terminal.
 - I wired up the /register endpoint this week, and also implemented the /login and /checkAuthToken endpoints
 - I wrote unit tests for all of these endpoints. If something breaks it's not my fault!
 - Next week it's my turn to do integration tests.
+
+3/8:
+- Added endpoints for /resetPassword and /getPasswordResetToken
+- I think we can use the setup I'd been doing for unit testing (sans the mocking) for our integration tests
+- Integration tests: next time, I promise!
