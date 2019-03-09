@@ -1,6 +1,11 @@
 package org.auth1.auth1.api.login;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.ZonedDateTime;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.ExpiringToken;
@@ -14,15 +19,9 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.ZonedDateTime;
-
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = AuthenticationController.class)
@@ -35,6 +34,7 @@ public class LoginTest {
     private final String INVALID_PASSWORD = "badpass";
     private final ExpiringToken VALID_TOKEN = new ExpiringToken("foo", NOW);
     private MockMvc mvc;
+
     @Mock
     private AuthenticationManager authenticationManager;
     @InjectMocks
@@ -42,13 +42,16 @@ public class LoginTest {
     private JacksonTester<LoginResponse> responseJson;
     private JacksonTester<ExpiringToken> tokenJson;
 
+  private MappingJackson2HttpMessageConverter springMvcJacksonConverter = new MappingJackson2HttpMessageConverter();
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        JacksonTester.initFields(this, new ObjectMapper());
+      JacksonTester.initFields(this, springMvcJacksonConverter.getObjectMapper());
 
-        mvc = MockMvcBuilders.standaloneSetup(authenticationController).build();
+      mvc = MockMvcBuilders.standaloneSetup(authenticationController)
+          .setMessageConverters(springMvcJacksonConverter).build();
     }
 
     @Test
@@ -58,6 +61,9 @@ public class LoginTest {
                 VALID_PASSWORD,null)).thenReturn(loginResult);
         when(this.authenticationManager.authenticate(UserIdentifier.forUsername(VALID_USERNAME),
                 VALID_PASSWORD,null)).thenReturn(loginResult);
+      when(
+          this.authenticationManager.authenticate(UserIdentifier.forUsernameOrEmail(VALID_USERNAME),
+              VALID_PASSWORD, null)).thenReturn(loginResult);
         when(this.authenticationManager.authenticate(UserIdentifier.forUsernameOrEmail(VALID_EMAIL),
                 VALID_PASSWORD,null)).thenReturn(loginResult);
 
