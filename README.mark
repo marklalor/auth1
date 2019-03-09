@@ -18,3 +18,10 @@
 - Added configuration option for whether or not email verification is required.
 - Added account registration in AuthenticationManager.
 - Validate user authentication tokens.
+
+3/8/2019
+- Made tests for registration, testing the usage of bcrypt and scrypt.
+- Made tests for checking the creation of password reset tokens.
+- Created abstraction UserIdentifier for the common case of calling methods by either username, email, or a value representing a username or email.
+- Added password reset token generation.
+- Added password reset with token.
