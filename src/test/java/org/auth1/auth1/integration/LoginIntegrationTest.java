@@ -6,29 +6,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.ZonedDateTime;
+import org.auth1.auth1.Application;
 import org.auth1.auth1.api.login.LoginResponse;
-import org.auth1.auth1.config.IntegrationTestConfig;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.ExpiringToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
-//@AutoConfigureWebMvc
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {IntegrationTestConfig.class})
-@WebAppConfiguration
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
+@TestPropertySource(locations = "classpath:application.properties")
+@AutoConfigureMockMvc
 public class LoginIntegrationTest {
 
   private static final ZonedDateTime NOW = ZonedDateTime.now();
@@ -42,10 +39,8 @@ public class LoginIntegrationTest {
 
   private JacksonTester<LoginResponse> responseJson;
 
-  private MockMvc mvc;
-
   @Autowired
-  private WebApplicationContext wac;
+  private MockMvc mvc;
 
   private MappingJackson2HttpMessageConverter springMvcJacksonConverter = new MappingJackson2HttpMessageConverter();
 
@@ -53,9 +48,16 @@ public class LoginIntegrationTest {
   @Before
   public void setUp() {
     JacksonTester.initFields(this, springMvcJacksonConverter.getObjectMapper());
-
-    mvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
   }
+
+//  @Test
+//  public void givenWac_whenServletContext_thenItProvidesGreetController() {
+//    ServletContext servletContext = wac.getServletContext();
+//
+//    Assert.assertNotNull(servletContext);
+//    Assert.assertTrue(servletContext instanceof MockServletContext);
+//    System.out.println(wac.getBeanDefinitionNames());
+//  }
 
   @Test
   public void loginWithoutTotp() throws Exception {
