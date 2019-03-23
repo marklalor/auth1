@@ -1,3 +1,8 @@
+3/22/19:
+- This week our group worked together to get integration tests to work for all the layers between API and persistence
+- Within this effort, I worked with Spring Boot to figure out how to setup a mock MVC
+- Additionally, I included my script for loading an embeddable database for the integration test
+
 3/8/19:
 - I added a reset password method to the UserDAO + an integration test for it
 - I added implementations to the TokenDAOImpl class + integration tests for logout() and saveUserAuthToken()
