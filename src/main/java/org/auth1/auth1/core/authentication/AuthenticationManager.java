@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
+
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
 import org.auth1.auth1.model.Auth1Configuration;
@@ -22,6 +23,16 @@ import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+/**
+ * <p>The AuthenticationManager runs based on an {@link Auth1Configuration} and
+ * the database access objects in order to perform the Auth1 logic functions.</p>
+ *
+ * <p>The manager has methods corresponding to all the HTTP endpoints, for example
+ * {@link AuthenticationManager#register(String, String, String)}
+ * or {@link AuthenticationManager#checkAuthenticationToken(String)}. These methods
+ * are called by the HTTP code. They could also be easily called by some other
+ * protocol if there is ever a need for another interface (e.g. protobuf).</p>
+ */
 @Component
 public class AuthenticationManager {
     private final Auth1Configuration config;
@@ -39,7 +50,16 @@ public class AuthenticationManager {
     }
 
     /**
-     * Wrapper for inner functions that expect an unlocked User to perform their functions.
+     * Wrapper for inner functions that expect an unlocked {@link User} to perform
+     * their functions. Will return the specified accountDoesNotExistResult
+     * or accountIsLockedResult if the user specified by the userId
+     * does not exist. Otherwise it will call the given function, passing in
+     * the {@link User} that was received from the database.
+     *
+     * @param userId identifier of the user to perform the function with respect to
+     * @param function function to call with the user, if it exists.
+     * @param accountDoesNotExistResult result to return if the account specified by the userId does not exist
+     * @param accountIsLockedResult result to return if the account specified by the userId is locked.
      */
     private <T> T performWithExistingAndUnlockedAccount(UserIdentifier userId, Function<User, T> function,
                                                         T accountDoesNotExistResult, T accountIsLockedResult) {
@@ -55,22 +75,42 @@ public class AuthenticationManager {
                 .orElse(accountDoesNotExistResult);
     }
 
-  public GeneratePasswordResetTokenResult generatePasswordResetToken(UserIdentifier userId) {
+    /**
+     * <p>Generates and stores a password reset token for
+     * the specified user. The token will be valid for 1 hour.</p>
+     *
+     * <p>Another method should still be used to communicate this
+     * token to the user in some way. For example, by email.</p>
+     *
+     * @param userId identifier of the user to generate a password reset token for
+     * @return a {@link GeneratePasswordResetTokenResult} which will include the token the method was successful.
+     */
+    public GeneratePasswordResetTokenResult generatePasswordResetToken(UserIdentifier userId) {
         return performWithExistingAndUnlockedAccount(
                 userId,
                 this::generatePasswordResetToken,
-            GeneratePasswordResetTokenResult.ACCOUNT_DOES_NOT_EXIST,
-            GeneratePasswordResetTokenResult.ACCOUNT_LOCKED
+                GeneratePasswordResetTokenResult.ACCOUNT_DOES_NOT_EXIST,
+                GeneratePasswordResetTokenResult.ACCOUNT_LOCKED
         );
     }
 
-  private GeneratePasswordResetTokenResult generatePasswordResetToken(User user) {
+    private GeneratePasswordResetTokenResult generatePasswordResetToken(User user) {
         final PasswordResetToken token = PasswordResetToken.withDuration(user.getId(), 1, TimeUnit.HOURS);
         tokenDao.savePasswordResetToken(token);
-    return GeneratePasswordResetTokenResult
-        .forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
+        return GeneratePasswordResetTokenResult
+                .forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
     }
 
+    /**
+     * <p>Resets the password of the account associated with the given
+     * password reset token. The token authorizes the password reset
+     * as well as identifies the user whose password is to be reset.</p>
+     *
+     *
+     * @param passwordResetToken the string of the {@link PasswordResetToken} to use to reset the password.
+     * @param newPassword the new password to replace the old one with.
+     * @return a {@link ResetPasswordResult} which describes how the operation failed or succeeded.
+     */
     public ResetPasswordResult resetPassword(String passwordResetToken, String newPassword) {
         return tokenDao.getPasswordResetToken(passwordResetToken)
                 .map(PasswordResetToken::getUserId)
@@ -86,11 +126,24 @@ public class AuthenticationManager {
                 }).orElse(ResetPasswordResult.INVALID_TOKEN);
     }
 
-
-    private boolean passwordConformsToRules(String newPassword) {
+    /**
+     * <p>Determines whether the given password is valid depending on the
+     * rules specified by the user.</p>
+     * @param password the password to check the conformity of.
+     * @return <code>True</code> if the password passes all
+     * checks, <code>False</code> if it fails any of them.
+     */
+    private boolean passwordConformsToRules(String password) {
         return true; // TODO: password strength policy
     }
 
+    /**
+     * <p>Checks the validity of the given user authentication token.</p>
+     *
+     * @param token the string of the {@link UserAuthenticationToken} to check.
+     * @return a {@link CheckAuthenticationTokenResult} that describes the validity
+     * of the token, and includes the associated user id if it is valid.
+     */
     public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
         return tokenDao
                 .getAuthToken(token)
@@ -99,6 +152,17 @@ public class AuthenticationManager {
                 .orElseGet(CheckAuthenticationTokenResult::forInvalid);
     }
 
+    /**
+     * <p>Attempts to create a new user specified by the given parameters.
+     * One of the username or email may be null if they
+     * are not required by the {@link Auth1Configuration}.</p>
+     *
+     * @param username the username of the new user to be created.
+     * @param email the email of the new user to be created.
+     * @param rawPassword the raw (not hashed) password of the new user.
+     *                    This will be checked for validity so that weak passwords are not possible.
+     * @return a {@link RegistrationResult} that describes the outcome of the operation.
+     */
     public RegistrationResult register(@Nullable final String username, @Nullable final String email, final String rawPassword) {
         final var required = this.config.getRequiredUserFields();
 

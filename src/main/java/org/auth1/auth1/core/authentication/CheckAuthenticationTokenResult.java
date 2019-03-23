@@ -2,6 +2,16 @@ package org.auth1.auth1.core.authentication;
 
 import javax.annotation.Nullable;
 
+/**
+ * <p>Result of calling {@link AuthenticationManager#checkAuthenticationToken(String)} that describes a
+ * supplied token string.</p>
+ *
+ * <p>If the token was valid (associated with a user, and not expired), then {@link #isValid()} will
+ * return <code>true</code> and {@link #getUserId()} will return the id of the user associated with the token.</p>
+ *
+ * <p>If the token was not valid (not associated with a user, or expired), then {@link #isValid()} will return
+ * <code>false</code> and {@link #getUserId()} will not be callable.</p>
+ */
 public class CheckAuthenticationTokenResult {
     private final boolean valid;
     private final @Nullable Integer userId;
