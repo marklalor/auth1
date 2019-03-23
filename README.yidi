@@ -24,3 +24,10 @@ IntelliJ but managed to find workarounds for everything in the terminal.
 - Added endpoints for /resetPassword and /getPasswordResetToken
 - I think we can use the setup I'd been doing for unit testing (sans the mocking) for our integration tests
 - Integration tests: next time, I promise!
+
+3/22:
+- We tried to do integration testing this week, but it required us to understand some of the parts
+of Spring that we had been handwaving over before. With the essay hanging over our heads this week,
+none of us really managed to figure it out. We'll try to tackle it again next week, but if we
+still don't have any success, then we'll just stick to testing the system by hand, and moving on with
+building the rest of our features.
