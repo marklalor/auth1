@@ -179,6 +179,17 @@ public class AuthenticationManager {
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
     }
 
+    /**
+     * <p>Authenticates based on the provided userId and rawPassword (and totpCode
+     * if 2FA is configured). If the user and password match, then the
+     * returned {@link AuthenticationResult} will contain a user authentication token.</p>
+     *
+     * @param userId an identifier of the user account to attempt to authenticate against.
+     * @param rawPassword the password (unhashed) associated with the account to authenticate against.
+     * @param totpCode the current TOTP passcode of the associated account.
+     *                 Should be null if TOTP is not configured for this account.
+     * @return an {@link AuthenticationResult} that encapsulates the outcome of the operation.
+     */
     public AuthenticationResult authenticate(final UserIdentifier userId, final String rawPassword, final @Nullable String totpCode) {
         return performWithExistingAndUnlockedAccount(userId,
                 user -> this.authenticate(user, rawPassword, totpCode),

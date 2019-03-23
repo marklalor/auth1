@@ -8,6 +8,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * <p>Identifies an Auth1 user by either a username, an email,
+ * or a string that may represent a username or email.</p>
+ * To create an instance, see the methods {@link #forEmail(String)},
+ * {@link #forUsername(String)}, {@link #forUsernameOrEmail(String)}, and {@link #forOneOf(String, String, String)}
+ */
 public class UserIdentifier {
     public enum Type {
         USERNAME,
@@ -23,14 +29,27 @@ public class UserIdentifier {
         this.value = value;
     }
 
+    /**
+     * Returns a user identifier based on the given email address.
+     * @param email the email that identifies a user.
+     */
     public static UserIdentifier forEmail(String email) {
         return new UserIdentifier(Type.EMAIL, email);
     }
 
+    /**
+     * Returns a user identifier based on the given username.
+     * @param username the username that identifies a user.
+     */
     public static UserIdentifier forUsername(String username) {
         return new UserIdentifier(Type.USERNAME, username);
     }
 
+    /**
+     * Returns a user identifier based on a string that may represent a username or email address.
+     * @param usernameOrEmail string that can be a username or email address. The application will first try
+     *                        to treat the string as a username, then as an email if that fails.
+     */
     public static UserIdentifier forUsernameOrEmail(String usernameOrEmail) {
         return new UserIdentifier(Type.USERNAME_OR_EMAIL, usernameOrEmail);
     }
@@ -59,6 +78,12 @@ public class UserIdentifier {
         }
     }
 
+    /**
+     * Uses the provided {@link UserDao} to call the right DAO method based on
+     * the backing of this {@link UserIdentifier}.
+     * @return a {@link User} object if one exists and is associated with
+     * his {@link UserIdentifier}, {@link Optional#empty()} otherwise.
+     */
     public Optional<User> getUser(UserDao userDao) {
         switch (this.type) {
             case USERNAME:

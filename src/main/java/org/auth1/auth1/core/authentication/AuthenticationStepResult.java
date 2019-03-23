@@ -3,6 +3,11 @@ package org.auth1.auth1.core.authentication;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+/**
+ * Required return value for authentication steps. Steps should return {@link #stepPassed()} if they succeeded,
+ * and a result specified by {@link #of(AuthenticationResult)} if they should terminate the sequence and return the
+ * provided {@link AuthenticationResult}.
+ */
 class AuthenticationStepResult {
     private final AuthenticationResult result;
 
