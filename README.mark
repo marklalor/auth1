@@ -25,3 +25,8 @@
 - Created abstraction UserIdentifier for the common case of calling methods by either username, email, or a value representing a username or email.
 - Added password reset token generation.
 - Added password reset with token.
+
+3/22/2019
+- Worked on integration tests as a group, particularly figuring out how Spring works with testing contexts, which we didn't get much results from due to Spring and database difficulties. Brian made some breakthrough progress later on however.
+- Added documentation for most all of the core auth1 methods, particually in AuthenticationManager
+- Documented data classes and their formats/semantics.
