@@ -196,6 +196,27 @@ public class AuthenticationManager {
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
     }
 
+
+    private CreateTentativeTOTPResult createTentativeTOTPSecret(int userId) {
+
+    }
+
+    public CreateTentativeTOTPResult createTentativeTOTPSecret(String token) {
+        return tokenDao.getAuthToken(token)
+                .map(UserAuthenticationToken::getUserId)
+                .map(this::createTentativeTOTPSecret)
+                .orElse(CreateTentativeTOTPResult.INVALID_TOKEN);
+    }
+
+    public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
+        logger.debug("Checking authentication token \"" + token.substring(0, 3) + "...\"");
+        return tokenDao
+                .getAuthToken(token)
+                .map(UserAuthenticationToken::getUserId)
+                .map(CheckAuthenticationTokenResult::forSuccess)
+                .orElseGet(CheckAuthenticationTokenResult::forInvalid);
+    }
+
     /**
      * <p>Authenticates based on the provided userId and rawPassword (and totpCode
      * if 2FA is configured). If the user and password match, then the
