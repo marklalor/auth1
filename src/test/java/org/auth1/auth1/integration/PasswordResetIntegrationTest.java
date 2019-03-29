@@ -1,14 +1,16 @@
 package org.auth1.auth1.integration;
 
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.ZonedDateTime;
 import org.auth1.auth1.Application;
 import org.auth1.auth1.api.login.LoginResponse;
-import org.auth1.auth1.database.DatabaseLoader;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,12 +21,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.time.ZonedDateTime;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
@@ -41,25 +37,12 @@ public class PasswordResetIntegrationTest {
     private final String VALID_PASSWORD = "password";
     private final String NEW_VALID_PASSWORD = "newPassword";
 
-    private static DatabaseLoader databaseLoader;
-
     private JacksonTester<LoginResponse> responseJson;
 
     @Autowired
     private MockMvc mvc;
 
     private MappingJackson2HttpMessageConverter springMvcJacksonConverter = new MappingJackson2HttpMessageConverter();
-
-    @BeforeClass
-    public static void setupDatabase() throws Exception {
-        databaseLoader = new DatabaseLoader();
-        databaseLoader.startDB();
-    }
-
-    @AfterAll
-    public static void teardownDatabase() {
-        databaseLoader.closeDB();
-    }
 
     @Before
     public void setUp() throws Exception {
