@@ -106,6 +106,20 @@ public class UserIdentifier {
     }
 
     @Override
+    public String toString() {
+        switch (this.type) {
+            case USERNAME:
+                return "UserIdentifier(username=\"" + this.value + "\")";
+            case EMAIL:
+                return "UserIdentifier(email=\"" + this.value + "\")";
+            case USERNAME_OR_EMAIL:
+                return "UserIdentifier(usernameOrEmail=\"" + this.value + "\")";
+        }
+
+        throw new IllegalStateException("Didn't cover all switch cases.");
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
