@@ -9,6 +9,7 @@ import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.USERNA
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,6 +38,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AuthenticationManager {
+
+    Logger logger = LoggerFactory.getLogger(AuthenticationManager.class);
+
     private final Auth1Configuration config;
     private final UserDao userDao;
     private final TokenDao tokenDao;
@@ -63,12 +69,15 @@ public class AuthenticationManager {
      */
     private <T> T performWithExistingAndUnlockedAccount(UserIdentifier userId, Function<User, T> function,
                                                         T accountDoesNotExistResult, T accountIsLockedResult) {
+        logger.debug("Finding account for: " + userId);
         return userId
                 .getUser(userDao)
                 .map(user -> {
                     if (user.isLocked()) {
+                        logger.debug("Account locked for " + userId);
                         return accountIsLockedResult;
                     } else {
+                        logger.debug("Found account for " + userId + ". Executing function.");
                         return function.apply(user);
                     }
                 })
@@ -95,8 +104,10 @@ public class AuthenticationManager {
     }
 
     private GeneratePasswordResetTokenResult generatePasswordResetToken(User user) {
+        logger.debug("Generating a password reset token for " + user.getAnyUserIdentifier());
         final PasswordResetToken token = PasswordResetToken.withDuration(user.getId(), 1, TimeUnit.HOURS);
         tokenDao.savePasswordResetToken(token);
+        logger.debug("Saved password reset token for " + user.getAnyUserIdentifier());
         return GeneratePasswordResetTokenResult
                 .forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
     }
@@ -112,6 +123,7 @@ public class AuthenticationManager {
      * @return a {@link ResetPasswordResult} which describes how the operation failed or succeeded.
      */
     public ResetPasswordResult resetPassword(String passwordResetToken, String newPassword) {
+        logger.debug("Resetting password with token");
         return tokenDao.getPasswordResetToken(passwordResetToken)
                 .map(PasswordResetToken::getUserId)
                 .flatMap(userDao::getUserById)
@@ -119,8 +131,10 @@ public class AuthenticationManager {
                     if (this.passwordConformsToRules(newPassword)) {
                         user.setPassword(this.config.getHashFunction().hash(newPassword));
                         userDao.saveUser(user);
+                        logger.debug("Successfully reset password for " + user.getAnyUserIdentifier());
                         return ResetPasswordResult.SUCCESS;
                     } else {
+                        logger.debug("Password reset candidate did not conform to password rules.");
                         return ResetPasswordResult.INVALID_PASSWORD;
                     }
                 }).orElse(ResetPasswordResult.INVALID_TOKEN);
@@ -145,6 +159,7 @@ public class AuthenticationManager {
      * of the token, and includes the associated user id if it is valid.
      */
     public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
+        logger.debug("Checking authentication token \"" + token.substring(0, 3) + "...\"");
         return tokenDao
                 .getAuthToken(token)
                 .map(UserAuthenticationToken::getUserId)
@@ -164,6 +179,7 @@ public class AuthenticationManager {
      * @return a {@link RegistrationResult} that describes the outcome of the operation.
      */
     public RegistrationResult register(@Nullable final String username, @Nullable final String email, final String rawPassword) {
+        logger.debug("Registering new user...");
         final var required = this.config.getRequiredUserFields();
 
         if ((required == USERNAME_ONLY || required == USERNAME_AND_EMAIL) && username == null) {
@@ -175,8 +191,30 @@ public class AuthenticationManager {
         final var password = this.config.getHashFunction().hash(rawPassword);
         final var newUser = new User(username, password, null, email, false, false, ZonedDateTime.now());
         userDao.saveUser(newUser);
+        logger.debug("Created new user: (username=\"" + username + "\", email=\"" + email + "\"");
         return this.config.isEmailVerificationRequired()
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
+    }
+
+
+    private CreateTentativeTOTPResult createTentativeTOTPSecret(int userId) {
+
+    }
+
+    public CreateTentativeTOTPResult createTentativeTOTPSecret(String token) {
+        return tokenDao.getAuthToken(token)
+                .map(UserAuthenticationToken::getUserId)
+                .map(this::createTentativeTOTPSecret)
+                .orElse(CreateTentativeTOTPResult.INVALID_TOKEN);
+    }
+
+    public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
+        logger.debug("Checking authentication token \"" + token.substring(0, 3) + "...\"");
+        return tokenDao
+                .getAuthToken(token)
+                .map(UserAuthenticationToken::getUserId)
+                .map(CheckAuthenticationTokenResult::forSuccess)
+                .orElseGet(CheckAuthenticationTokenResult::forInvalid);
     }
 
     /**
@@ -191,6 +229,7 @@ public class AuthenticationManager {
      * @return an {@link AuthenticationResult} that encapsulates the outcome of the operation.
      */
     public AuthenticationResult authenticate(final UserIdentifier userId, final String rawPassword, final @Nullable String totpCode) {
+        logger.debug("Authenticating: " + userId);
         return performWithExistingAndUnlockedAccount(userId,
                 user -> this.authenticate(user, rawPassword, totpCode),
                 AuthenticationResult.USER_DOES_NOT_EXIST,
@@ -218,25 +257,54 @@ public class AuthenticationManager {
             mgr -> mgr::checkTOTP);
 
     private AuthenticationStepResult checkLocked(User user, final String rawPassword, final @Nullable String totpCode) {
+        logger.debug("Authentication step: checking if user is locked. " + user.getAnyUserIdentifier());
         return !user.isLocked() ? stepPassed() : of(AuthenticationResult.ACCOUNT_LOCKED);
     }
 
     private AuthenticationStepResult checkRate(User user, final String rawPassword, final @Nullable String totpCode) {
+        logger.debug("Authentication step: checking if account is rate-limited. " + user.getAnyUserIdentifier());
         return stepPassed(); // no rate limiting right now.
     }
 
     private AuthenticationStepResult checkVerified(User user, final String rawPassword, final @Nullable String totpCode) {
+        logger.debug("Authentication step: checking if user is verified. " + user.getAnyUserIdentifier());
         final var notRequiredOrVerified = !this.config.isEmailVerificationRequired() || user.isVerified();
         return notRequiredOrVerified ? stepPassed() : of(AuthenticationResult.NOT_VERIFIED);
     }
 
     private AuthenticationStepResult checkPassword(User user, final String rawPassword, final @Nullable String totpCode) {
+        logger.debug("Authentication step: checking user password. " + user.getAnyUserIdentifier());
         final var match = this.config.getCheckFunction().check(rawPassword, user.getPassword());
         return match ? stepPassed() : of(AuthenticationResult.BAD_PASSWORD);
     }
 
+    // TOTP constants are set because Google Authenticator hardcodes these!
+    public final static long TOTP_PERIOD_MILLIS = TimeUnit.SECONDS.toMillis(30);
+    public final static String TOTP_HMAC_ALGORITHM = "HmacSHA1";
+
+    /**
+     * Periods relative to the current period that are still considered valid. For example {0, -1} considers the
+     * currently-valid TOTP code, as well as the code that was valid 30 seconds ago. This is very common because
+     * often people are typing in a passcode when the time period changes. Especially important for accessibility
+     * purposes in case it takes someone a long time to type their TOTP code.
+     */
+    public final static long[] VALID_TOTP_PERIODS = {0, -1};
+
+
+    private static boolean checkTOTP(final byte[] secret, final String code) {
+        final var currentPeriods = System.currentTimeMillis() / TOTP_PERIOD_MILLIS;
+        return Arrays.stream(VALID_TOTP_PERIODS)
+                .map(offset -> currentPeriods + offset)
+                .mapToObj(time -> TOTP.generateTOTP(secret, Long.toHexString(time).toUpperCase(), 6, TOTP_HMAC_ALGORITHM))
+                .anyMatch(code::equalsIgnoreCase);
+    }
+
     private AuthenticationStepResult checkTOTP(User user, final String rawPassword, final @Nullable String totpCode) {
-        return stepPassed(); // no TOTP right now.
+        logger.debug("Authentication step: checking TOTP code. " + user.getAnyUserIdentifier());
+        return Optional.ofNullable(user.getTotpSecret())
+                .map(secret -> checkTOTP(secret, totpCode))
+                .map(result -> result ? stepPassed() : of(AuthenticationResult.BAD_TOTP))
+                .orElse(stepPassed());
     }
 
 }

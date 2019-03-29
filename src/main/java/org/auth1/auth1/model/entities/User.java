@@ -1,5 +1,7 @@
 package org.auth1.auth1.model.entities;
 
+import org.auth1.auth1.core.authentication.UserIdentifier;
+
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -46,6 +48,10 @@ public class User {
         this.verified = verified;
         this.locked = locked;
         this.creationTime = creationTime;
+    }
+
+    public UserIdentifier getAnyUserIdentifier() {
+        return UserIdentifier.forOneOf(username, email, null);
     }
 
     public int getId() {
@@ -101,6 +107,9 @@ public class User {
         return Objects.hash(username, password, email, verified, locked);
     }
 
+    /**
+     * Don't use this in logs, just for debugging... has the hashed password.
+     */
     @Override
     public String toString() {
         return "User{" +

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `User` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`username` VARCHAR(255) NOT NULL,
 	`password` VARCHAR(255) NOT NULL,
-	`totp_secret` BINARY(128) DEFAULT NULL,
+	`totp_secret` BINARY(80) DEFAULT NULL,
 	`email` VARCHAR(255) DEFAULT NULL,
 	`verified` BOOLEAN DEFAULT FALSE NOT NULL,
 	`locked` BOOLEAN DEFAULT FALSE NOT NULL,
@@ -61,4 +61,13 @@ CREATE TABLE IF NOT EXISTS `PasswordlessLoginToken` (
 	`expiration_time` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES User(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `TentativeTOTPConfiguration` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`user_id` INT NOT NULL,
+	`tentative_totp_secret` BINARY(80) NOT NULL,
+	`expiration_time` DATETIME NOT NULL,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`user_id`) REFERENCES User(`id`)
 );
