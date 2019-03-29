@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 @Table(name = "LoginRecord")
 public class LoginRecord {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 

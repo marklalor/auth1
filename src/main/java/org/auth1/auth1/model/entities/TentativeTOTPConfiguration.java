@@ -1,13 +1,14 @@
 package org.auth1.auth1.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
+import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class TentativeTOTPConfiguration {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -24,11 +25,20 @@ public class TentativeTOTPConfiguration {
 
     }
 
-    public TentativeTOTPConfiguration(int id, int userId, byte[] tentativeTOTPSecret, ZonedDateTime expirationTime) {
-        this.id = id;
+    public TentativeTOTPConfiguration(int userId, byte[] tentativeTOTPSecret, ZonedDateTime expirationTime) {
         this.userId = userId;
         this.tentativeTOTPSecret = tentativeTOTPSecret;
         this.expirationTime = expirationTime;
+    }
+
+    public final static int VALIDITY_DURATION = 10;
+    public final static TimeUnit VALIDITY_DURATION_UNITS = TimeUnit.MINUTES;
+
+    public static TentativeTOTPConfiguration forUser(int userId) {
+        final byte[] secret = new byte[80];
+        new SecureRandom().nextBytes(secret);
+        final ZonedDateTime expirationTime = ZonedDateTime.now().plus(VALIDITY_DURATION, VALIDITY_DURATION_UNITS.toChronoUnit());
+        return new TentativeTOTPConfiguration(userId, secret, expirationTime);
     }
 
     public int getId() {

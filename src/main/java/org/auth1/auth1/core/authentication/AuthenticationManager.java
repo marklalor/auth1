@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
+import org.auth1.auth1.dao.TentativeTOTPConfigurationDao;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
 import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.entities.PasswordResetToken;
+import org.auth1.auth1.model.entities.TentativeTOTPConfiguration;
 import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
 import org.slf4j.Logger;
@@ -44,12 +46,15 @@ public class AuthenticationManager {
     private final Auth1Configuration config;
     private final UserDao userDao;
     private final TokenDao tokenDao;
+    private final TentativeTOTPConfigurationDao tentativeTOTPConfigurationDao;
+
     private final List<AuthenticationStep> steps;
 
-    public AuthenticationManager(Auth1Configuration config, UserDao userDao, TokenDao tokenDao) {
+    public AuthenticationManager(Auth1Configuration config, UserDao userDao, TokenDao tokenDao, TentativeTOTPConfigurationDao tentativeTOTPConfigurationDao) {
         this.config = config;
         this.userDao = userDao;
         this.tokenDao = tokenDao;
+        this.tentativeTOTPConfigurationDao = tentativeTOTPConfigurationDao;
         this.steps = StreamSupport.stream(STEPS.spliterator(), false)
                 .map(f -> f.apply(this))
                 .collect(Collectors.toList());
@@ -196,9 +201,11 @@ public class AuthenticationManager {
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
     }
 
-
     private CreateTentativeTOTPResult createTentativeTOTPSecret(int userId) {
-
+        logger.debug("Saving new tentative TOTP configuration for user " + userId);
+        TentativeTOTPConfiguration config = TentativeTOTPConfiguration.forUser(userId);
+        tentativeTOTPConfigurationDao.saveConfiguration(config);
+        return CreateTentativeTOTPResult.forSuccess(config.getTentativeTOTPSecret(), config.getExpirationTime());
     }
 
     public CreateTentativeTOTPResult createTentativeTOTPSecret(String token) {
@@ -208,13 +215,34 @@ public class AuthenticationManager {
                 .orElse(CreateTentativeTOTPResult.INVALID_TOKEN);
     }
 
-    public CheckAuthenticationTokenResult checkAuthenticationToken(String token) {
-        logger.debug("Checking authentication token \"" + token.substring(0, 3) + "...\"");
-        return tokenDao
-                .getAuthToken(token)
+    private ConfirmTentativeTOTPResult confirmTentativeTOTPSecret(int userId, String code) {
+        return tentativeTOTPConfigurationDao
+                .getConfiguration(userId)
+                .map(config -> {
+                    if (config.getExpirationTime().isBefore(ZonedDateTime.now())) {
+                        return ConfirmTentativeTOTPResult.TENTATIVE_TOTP_SECRET_EXPIRED;
+                    } else {
+                        final boolean codeValid = checkTOTP(config.getTentativeTOTPSecret(), code);
+                        if (codeValid) {
+                            Optional<User> userById = userDao.getUserById(userId);
+                            userById.map(user -> {
+                                user.setTotpSecret(config.getTentativeTOTPSecret());
+                                userDao.saveUser(user);
+                                return ConfirmTentativeTOTPResult.SUCCESS;
+                            }).orElse(ConfirmTentativeTOTPResult.INVALID_TOKEN);
+                            return ConfirmTentativeTOTPResult.SUCCESS;
+                        } else {
+                            return ConfirmTentativeTOTPResult.INVALID_CODE;
+                        }
+                    }
+                }).orElse(ConfirmTentativeTOTPResult.TENTATIVE_TOTP_SECRET_NOT_CREATED);
+    }
+
+    public ConfirmTentativeTOTPResult confirmTentativeTOTPSecret(String token, String code) {
+        return tokenDao.getAuthToken(token)
                 .map(UserAuthenticationToken::getUserId)
-                .map(CheckAuthenticationTokenResult::forSuccess)
-                .orElseGet(CheckAuthenticationTokenResult::forInvalid);
+                .map(userId -> confirmTentativeTOTPSecret(userId, code))
+                .orElse(ConfirmTentativeTOTPResult.INVALID_TOKEN);
     }
 
     /**

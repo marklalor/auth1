@@ -74,16 +74,32 @@ public class User {
         return totpSecret;
     }
 
+    public void setTotpSecret(byte[] totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isVerified() {
         return verified;
     }
 
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
     public boolean isLocked() {
         return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public ZonedDateTime getCreationTime() {
