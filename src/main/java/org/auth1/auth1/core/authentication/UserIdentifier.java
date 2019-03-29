@@ -16,9 +16,19 @@ import java.util.stream.Stream;
  */
 public class UserIdentifier {
     public enum Type {
-        USERNAME,
-        EMAIL,
-        USERNAME_OR_EMAIL
+        USERNAME("username"),
+        EMAIL("email"),
+        USERNAME_OR_EMAIL("username");
+
+        private final String fieldName;
+
+        Type(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
     }
 
     private final Type type;

@@ -12,6 +12,10 @@ import java.util.concurrent.TimeUnit;
 @Table(name = "PasswordResetToken")
 public class PasswordResetToken extends UserToken {
 
+    public PasswordResetToken() {
+        super();
+    }
+
     public PasswordResetToken(String value, int userId, ZonedDateTime issueTime, ZonedDateTime expirationTime) {
         super(value, userId, issueTime, expirationTime);
     }

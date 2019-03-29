@@ -4,8 +4,10 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.auth1.auth1.database.DatabaseLoader;
 import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.DatabaseManager;
+import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.model.entities.UserAuthenticationToken;
+import org.auth1.auth1.test_entities.ExamplePasswordResetToken;
 import org.auth1.auth1.test_entities.ExampleUser;
 import org.auth1.auth1.test_entities.ExampleUserAuthenticationToken;
 import org.hibernate.criterion.Example;
@@ -70,7 +72,17 @@ class TokenDaoImplTest {
     }
 
     @Test
-    void savePasswordResetToken() {
+    void savePasswordResetToken() throws SQLException {
+        final PasswordResetToken exampleToken = ExamplePasswordResetToken.INSTANCE;
+        tokenDao.savePasswordResetToken(exampleToken);
+        final MysqlDataSource dataSource = DatabaseLoader.getMySqlDataSource();
+        try (Connection conn = dataSource.getConnection()) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM PasswordResetToken;");
+            rs.next();
+            assertEquals(ExampleUserAuthenticationToken.VALUE, rs.getString("value"));
+            assertEquals(ExampleUserAuthenticationToken.USER_ID, rs.getInt("user_id"));
+        }
     }
 
     @Test
@@ -88,9 +100,19 @@ class TokenDaoImplTest {
 
     @Test
     void getAuthToken() {
+        final UserAuthenticationToken exampleToken = ExampleUserAuthenticationToken.INSTANCE;
+        tokenDao.saveLoginToken(exampleToken);
+        Optional<UserAuthenticationToken> resToken = tokenDao.getAuthToken(exampleToken.getValue());
+        assertTrue(resToken.isPresent());
+        assertEquals(exampleToken.getValue(), resToken.get().getValue());
     }
 
     @Test
     void getPasswordResetToken() {
+        final PasswordResetToken exampleToken = ExamplePasswordResetToken.INSTANCE;
+        tokenDao.savePasswordResetToken(exampleToken);
+        Optional<PasswordResetToken> resToken = tokenDao.getPasswordResetToken(exampleToken.getValue());
+        assertTrue(resToken.isPresent());
+        assertEquals(exampleToken.getValue(), resToken.get().getValue());
     }
 }
