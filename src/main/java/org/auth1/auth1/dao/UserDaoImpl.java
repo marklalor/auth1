@@ -7,7 +7,6 @@ import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.util.DBUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -27,18 +26,26 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void setPasswordResetToken(UserIdentifier userIdentifier, String passwordResetToken) {
-        throw new NotYetImplementedException();
-    }
-
-    @Override
     public void lockUser(UserIdentifier userIdentifier) {
-        throw new NotYetImplementedException();
+       setUserLockedStatus(userIdentifier, true);
     }
 
     @Override
     public void unlockUser(UserIdentifier userIdentifier) {
-        throw new NotYetImplementedException();
+        setUserLockedStatus(userIdentifier, false);
+    }
+
+    private void setUserLockedStatus(UserIdentifier userIdentifier, boolean shouldLockUser) {
+        Session session = databaseManager.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        String updateQuery = "UPDATE User u SET u.locked = :locked WHERE u.:fieldName = :userId";
+        session.createQuery( updateQuery )
+                .setParameter( "fieldName", userIdentifier.getType().getFieldName() )
+                .setParameter( "locked", shouldLockUser )
+                .executeUpdate();
+        session.getTransaction().commit();
+        session.close();
     }
 
     @Override
