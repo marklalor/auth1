@@ -10,6 +10,12 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * Configuration class for all Auth1 options. Maybe generated
+ * from an auth1.cnf file using {@link Auth1Configuration#fromConfigurationFile(InputStream)},
+ * or manually constructed using
+ * {@link Auth1Configuration#Auth1Configuration(HashAlgorithm, int, int, int, int, RequiredUserFields, boolean)}
+ */
 public class Auth1Configuration {
 
     public interface HashFunction {

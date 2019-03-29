@@ -2,6 +2,10 @@ package org.auth1.auth1.core.authentication;
 
 import javax.annotation.Nullable;
 
+/**
+ * Result of calling {@link AuthenticationManager#authenticate(UserIdentifier, String, String)}.
+ * See the constants of {@link ResultType} for details on the various states this class can take on.
+ */
 public class AuthenticationResult {
     public static final AuthenticationResult USER_DOES_NOT_EXIST
             = new AuthenticationResult(ResultType.USER_DOES_NOT_EXIST, null, null, null);
@@ -14,11 +18,30 @@ public class AuthenticationResult {
 
 
     public enum ResultType {
+        /**
+         * The authentication was successful, and {@link AuthenticationResult#getUserAuthenticationToken()}
+         * returns a token object.
+         */
         SUCCESS,
+        /**
+         * Too many authentication requests were made in a recent window of time so the request was not processed.
+         */
         TOO_MANY_REQUESTS,
+        /**
+         * A user did not exist that matched the provided user identifier.
+         */
         USER_DOES_NOT_EXIST,
+        /**
+         * The provided password did not match the password of the user.
+         */
         BAD_PASSWORD,
+        /**
+         * The account exists but is not verified so it cannot be authenticated against.
+         */
         NOT_VERIFIED,
+        /**
+         * The account exists but is locked so it cannot be authenticated against.
+         */
         ACCOUNT_LOCKED
     }
 

@@ -5,6 +5,10 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Properties;
 
+/**
+ * Configuration for database connection parameters. May be
+ * loaded from database.cnf with {@link #fromConfigurationFile(InputStream)}.
+ */
 public class DatabaseConfiguration {
 
     static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%d/%s";
