@@ -30,3 +30,10 @@
 - Worked on integration tests as a group, particularly figuring out how Spring works with testing contexts, which we didn't get much results from due to Spring and database difficulties. Brian made some breakthrough progress later on however.
 - Added documentation for most all of the core auth1 methods, particually in AuthenticationManager
 - Documented data classes and their formats/semantics.
+
+3/29/2019
+- Adapted TOTP code from Appendix A of RFC 6238 (TOTP: Time-Based One-Time Password Algorithm).
+- Added TOTP code requirement/checking in the authenticate method (if configured).
+- Added endpoints for TOTP registration/setup. First endpoint creates a tentative configuration and the second one requires the user to provide the TOTP code to confirm it and apply the changes.
+- Inserted logging statements into the AuthenticationManager.
+
