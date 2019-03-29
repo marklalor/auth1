@@ -1,3 +1,7 @@
+3/28/19:
+- I finished all the DAO methods and added integration tests for all of them
+- I added a Register E2E integration test
+
 3/22/19:
 - This week our group worked together to get integration tests to work for all the layers between API and persistence
 - Within this effort, I worked with Spring Boot to figure out how to setup a mock MVC
