@@ -51,7 +51,7 @@ public class User {
     }
 
     public UserIdentifier getAnyUserIdentifier() {
-        return UserIdentifier.forOneOf(username, email, null);
+        return UserIdentifier.forOneOf(username, null, null);
     }
 
     public int getId() {
