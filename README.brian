@@ -1,3 +1,8 @@
+4/5/19:
+- I added a Python library that allows middle users to easily make requests to their Auth1 instance
+- I uploaded auth1api to PyPi: https://pypi.org/project/auth1api/
+- I fixed a few bugs dealing with Auth1's application layer logic
+
 3/28/19:
 - I finished all the DAO methods and added integration tests for all of them
 - I added a Register E2E integration test
