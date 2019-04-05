@@ -20,6 +20,10 @@ public class GetPasswordResetTokenResponse {
     return new GetPasswordResetTokenResponse(result.getType(), result.getPasswordResetToken());
   }
 
+  public ResultType getResultType() {
+    return resultType;
+  }
+
   public ExpiringToken getToken() {
     return token;
   }

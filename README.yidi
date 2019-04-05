@@ -31,3 +31,10 @@ of Spring that we had been handwaving over before. With the essay hanging over o
 none of us really managed to figure it out. We'll try to tackle it again next week, but if we
 still don't have any success, then we'll just stick to testing the system by hand, and moving on with
 building the rest of our features.
+
+3/29:
+- Finally got integration testing to work
+- Briefly had some trouble from repeatedly setting up the embedded db, but solved it by creating a
+test suite for the integration tests which share the setup code
+- Added the API endpoints for TOTP
+- This completes our core functionality. Anything else from here is icing on the cake

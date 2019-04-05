@@ -10,7 +10,6 @@ import org.auth1.auth1.Application;
 import org.auth1.auth1.api.login.LoginResponse;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.ExpiringToken;
-import org.auth1.auth1.database.DatabaseLoader;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +35,6 @@ public class LoginIntegrationTest {
     private final String VALID_PASSWORD = "password";
     private final String INVALID_PASSWORD = "badpass";
     private final ExpiringToken VALID_TOKEN = new ExpiringToken("foo", NOW);
-
-    private static DatabaseLoader databaseLoader;
 
     private JacksonTester<LoginResponse> responseJson;
 
