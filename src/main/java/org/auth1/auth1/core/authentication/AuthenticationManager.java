@@ -6,6 +6,7 @@ import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.EMAIL_
 import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.USERNAME_AND_EMAIL;
 import static org.auth1.auth1.model.Auth1Configuration.RequiredUserFields.USERNAME_ONLY;
 
+import java.net.InetAddress;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -16,14 +17,12 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
+import org.auth1.auth1.dao.LoginRecordDao;
 import org.auth1.auth1.dao.TentativeTOTPConfigurationDao;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
 import org.auth1.auth1.model.Auth1Configuration;
-import org.auth1.auth1.model.entities.PasswordResetToken;
-import org.auth1.auth1.model.entities.TentativeTOTPConfiguration;
-import org.auth1.auth1.model.entities.User;
-import org.auth1.auth1.model.entities.UserAuthenticationToken;
+import org.auth1.auth1.model.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -47,14 +46,16 @@ public class AuthenticationManager {
     private final UserDao userDao;
     private final TokenDao tokenDao;
     private final TentativeTOTPConfigurationDao tentativeTOTPConfigurationDao;
+    private final LoginRecordDao loginRecordDao;
 
     private final List<AuthenticationStep> steps;
 
-    public AuthenticationManager(Auth1Configuration config, UserDao userDao, TokenDao tokenDao, TentativeTOTPConfigurationDao tentativeTOTPConfigurationDao) {
+    public AuthenticationManager(Auth1Configuration config, UserDao userDao, TokenDao tokenDao, TentativeTOTPConfigurationDao tentativeTOTPConfigurationDao, LoginRecordDao loginRecordDao) {
         this.config = config;
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.tentativeTOTPConfigurationDao = tentativeTOTPConfigurationDao;
+        this.loginRecordDao = loginRecordDao;
         this.steps = StreamSupport.stream(STEPS.spliterator(), false)
                 .map(f -> f.apply(this))
                 .collect(Collectors.toList());
@@ -256,16 +257,16 @@ public class AuthenticationManager {
      *                 Should be null if TOTP is not configured for this account.
      * @return an {@link AuthenticationResult} that encapsulates the outcome of the operation.
      */
-    public AuthenticationResult authenticate(final UserIdentifier userId, final String rawPassword, final @Nullable String totpCode) {
+    public AuthenticationResult authenticate(final UserIdentifier userId, final String rawPassword, final @Nullable String totpCode, @Nullable final InetAddress userIp, @Nullable  final String userAgent) {
         logger.debug("Authenticating: " + userId);
         return performWithExistingAndUnlockedAccount(userId,
-                user -> this.authenticate(user, rawPassword, totpCode),
+                user -> this.authenticate(user, rawPassword, totpCode, userIp, userAgent),
                 AuthenticationResult.USER_DOES_NOT_EXIST,
                 AuthenticationResult.ACCOUNT_LOCKED);
     }
 
-    private AuthenticationResult authenticate(final User user, final String rawPassword, final @Nullable String totpCode) {
-        return steps.stream()
+    private AuthenticationResult authenticate(final User user, final String rawPassword, final @Nullable String totpCode, @Nullable final InetAddress userIp, @Nullable final String userAgent) {
+        AuthenticationResult result = steps.stream()
                 .map(step -> step.doStep(user, rawPassword, totpCode))
                 .filter(AuthenticationStepResult::failed)
                 .findFirst()
@@ -275,6 +276,14 @@ public class AuthenticationManager {
                     tokenDao.saveLoginToken(token);
                     return AuthenticationResult.forSuccess(new ExpiringToken(token.getValue(), token.getExpirationTime()));
                 });
+        logAuthenticationResult(result, user, userIp, userAgent);
+        return result;
+    }
+
+    public void logAuthenticationResult(final AuthenticationResult result, final User user, final @Nullable InetAddress userIp, final @Nullable String userAgent) {
+        final LoginRecord record = new LoginRecord(
+                user.getUsername(), ZonedDateTime.now(), userIp == null ? null : userIp.getCanonicalHostName(), userAgent, result.getType());
+        loginRecordDao.saveLoginRecord(record);
     }
 
     private static Iterable<Function<AuthenticationManager, AuthenticationStep>> STEPS = Arrays.asList(
