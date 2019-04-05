@@ -11,6 +11,7 @@ setuptools.setup(
     description="A library to make requests to your Auth1 instance",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    install_requires=['requests'],
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

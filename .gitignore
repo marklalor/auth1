@@ -2,3 +2,4 @@
 *.iml
 target/
 .DS_STORE
+auth1api/venv/
