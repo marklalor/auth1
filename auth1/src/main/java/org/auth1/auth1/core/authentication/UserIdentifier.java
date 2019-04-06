@@ -75,7 +75,7 @@ public class UserIdentifier {
      * the semantics of the return value would be otherwise confusing.
      */
     public static UserIdentifier forOneOf(@Nullable String username, @Nullable String email, @Nullable String usernameOrEmail) {
-        if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() > 1) {
+        if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() < 1) {
             throw new IllegalArgumentException("Only one of username, email, or usernameOrEmail may be non-null.");
         }
 

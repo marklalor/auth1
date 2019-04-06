@@ -32,7 +32,7 @@ class RegisterTest {
                 Assert.assertTrue("Hashed passwords do not match",
                         config.getCheckFunction().check(PASSWORD, user.getPassword()));
             }
-        }, null);
+        }, null, null, null);
         var result = manager.register(USERNAME, EMAIL, PASSWORD);
         Assert.assertEquals(result, RegistrationResult.SUCCESS);
     }

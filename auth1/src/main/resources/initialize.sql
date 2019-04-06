@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS `LoginRecord` (
 	`username` VARCHAR(255) NOT NULL,
 	`user_ip` VARCHAR(255) DEFAULT NULL,
 	`user_agent` VARCHAR(255) DEFAULT NULL,
-	`client_ip` VARCHAR(255) DEFAULT NULL,
-	`client_id` VARCHAR(255) DEFAULT NULL,
 	PRIMARY KEY (`id`)
 );
 

@@ -3,9 +3,12 @@ package org.auth1.auth1.core;
 import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.GeneratePasswordResetTokenResult;
 import org.auth1.auth1.core.authentication.UserIdentifier;
+import org.auth1.auth1.dao.UnimplementedLoginRecordDao;
+import org.auth1.auth1.dao.UnimplementedTentativeTOTPConfigurationDao;
 import org.auth1.auth1.dao.UnimplementedTokenDao;
 import org.auth1.auth1.dao.UnimplementedUserDao;
 import org.auth1.auth1.model.Auth1Configuration;
+import org.auth1.auth1.model.entities.LoginRecord;
 import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.User;
 import org.junit.Assert;
@@ -56,7 +59,14 @@ class ResetPasswordTest {
             public void savePasswordResetToken(PasswordResetToken token) {
                 reachedSaveBlock[0] = true;
             }
+        }, new UnimplementedTentativeTOTPConfigurationDao() {
+        }, new UnimplementedLoginRecordDao() {
+            @Override
+            public void saveLoginRecord(LoginRecord record) {
+
+            }
         });
+
         var result = manager.generatePasswordResetToken(UserIdentifier.forUsername(USERNAME));
         Assert.assertEquals(result.getType(), GeneratePasswordResetTokenResult.ResultType.SUCCESS);
         Assert.assertTrue(result.getPasswordResetToken().getExpirationTime().isAfter(ZonedDateTime.now()));

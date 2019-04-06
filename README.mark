@@ -37,3 +37,8 @@
 - Added endpoints for TOTP registration/setup. First endpoint creates a tentative configuration and the second one requires the user to provide the TOTP code to confirm it and apply the changes.
 - Inserted logging statements into the AuthenticationManager.
 
+4/5/2019
+- Created simple Python Flask app that interacts with the Auth1 API.
+- Added pages to Flask app for the login and checking of the authentication token.
+- Added creation of LoginRecord objects to the authentication process.
+- Added additional parameters to authenticate to account for user ip and user agent.

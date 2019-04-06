@@ -58,14 +58,14 @@ public class LoginTest {
     public void loginWithoutTotp() throws Exception {
         AuthenticationResult loginResult = AuthenticationResult.forSuccess(VALID_TOKEN);
         when(this.authenticationManager.authenticate(UserIdentifier.forEmail(VALID_EMAIL),
-                VALID_PASSWORD,null)).thenReturn(loginResult);
+                VALID_PASSWORD,null, null, null)).thenReturn(loginResult);
         when(this.authenticationManager.authenticate(UserIdentifier.forUsername(VALID_USERNAME),
-                VALID_PASSWORD,null)).thenReturn(loginResult);
+                VALID_PASSWORD,null, null, null)).thenReturn(loginResult);
       when(
           this.authenticationManager.authenticate(UserIdentifier.forUsernameOrEmail(VALID_USERNAME),
-              VALID_PASSWORD, null)).thenReturn(loginResult);
+              VALID_PASSWORD, null, null, null)).thenReturn(loginResult);
         when(this.authenticationManager.authenticate(UserIdentifier.forUsernameOrEmail(VALID_EMAIL),
-                VALID_PASSWORD,null)).thenReturn(loginResult);
+                VALID_PASSWORD,null, null, null)).thenReturn(loginResult);
 
         LoginResponse expected = LoginResponse.fromAuthenticationResult(loginResult);
 
@@ -121,7 +121,7 @@ public class LoginTest {
     @Test
     public void loginWithFailedAuth() throws Exception {
         AuthenticationResult loginResult = AuthenticationResult.BAD_PASSWORD;
-        when(this.authenticationManager.authenticate(UserIdentifier.forEmail(VALID_EMAIL), INVALID_PASSWORD, null))
+        when(this.authenticationManager.authenticate(UserIdentifier.forEmail(VALID_EMAIL), INVALID_PASSWORD, null, null, null))
                 .thenReturn(loginResult);
 
         LoginResponse expected = LoginResponse.fromAuthenticationResult(loginResult);

@@ -25,11 +25,11 @@ public class AuthenticationController {
                                                @RequestParam(value = "email", required = false) String email,
                                                @RequestParam(value = "password", required = true) String password,
                                                @RequestParam(value = "totpCode", required = false) String totpCode) {
-        if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() > 1) {
+        if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
-            final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode);
+            final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode, null, null);
             return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
         }
     }
