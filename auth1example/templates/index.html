@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth1 Example Application</title>
+    <style type="text/css">
+        a { color: #555; }
+        a:visited { color: #555; }
+        a:hover { color: #777; }​
+    </style>
+</head>
+<body>
+    <h1>Auth1 Example Application</h1>
+    <p>Logged in with user id of {{ user_id }}.</p>
+    <p id="cookie-p"></p>
+
+    <a href = "{{ url_for('logout') }}">Log out</a>
+
+    <script type="text/javascript">
+        let tokenCookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        document.getElementById("cookie-p").innerHTML = 'Cookie "token" = ' + tokenCookieValue
+    </script>
+</body>
+</html>

@@ -3,3 +3,4 @@
 target/
 .DS_STORE
 auth1api/venv/
+auth1example/venv/
