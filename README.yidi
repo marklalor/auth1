@@ -38,3 +38,13 @@ building the rest of our features.
 test suite for the integration tests which share the setup code
 - Added the API endpoints for TOTP
 - This completes our core functionality. Anything else from here is icing on the cake
+
+4/5:
+- I focused on containerizing this week so we could ship a packaged application that users could deploy in one click
+- Spent a lot of time fighting configuration files
+- Ran into trouble containerizing the application with the db it needs. First I tried to put both in the
+same container, but eventually realized that it's not easy to combine two containers
+- Had some trouble because had to learn docker-compose, which I had never encountered before. It can help
+spin up separate containers for db and application. It makes configuring each one cleaner, but there's some
+trickiness in the orchestration.
+- Currently have a non-functioning docker setup, but I'm confident I'll get there soon.
