@@ -2,6 +2,8 @@ package org.auth1.auth1.api.totp;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
+
+import com.google.common.io.BaseEncoding;
 import org.auth1.auth1.core.authentication.CreateTentativeTOTPResult;
 import org.auth1.auth1.core.authentication.CreateTentativeTOTPResult.ResultType;
 
@@ -9,7 +11,7 @@ public class RequestTotpSecretResponse {
 
   private final ResultType resultType;
   private final @Nullable
-  byte[] tentativeTotpSecret;
+  String tentativeTotpSecret;
   private final @Nullable
   ZonedDateTime expirationTime;
 
@@ -17,7 +19,7 @@ public class RequestTotpSecretResponse {
       ResultType resultType, @Nullable byte[] tentativeTotpSecret,
       @Nullable ZonedDateTime expirationTime) {
     this.resultType = resultType;
-    this.tentativeTotpSecret = tentativeTotpSecret;
+    this.tentativeTotpSecret = tentativeTotpSecret != null ? BaseEncoding.base32().encode(tentativeTotpSecret) : null;
     this.expirationTime = expirationTime;
   }
 
@@ -31,7 +33,7 @@ public class RequestTotpSecretResponse {
   }
 
   @Nullable
-  public byte[] getTentativeTotpSecret() {
+  public String getTentativeTotpSecret() {
     return tentativeTotpSecret;
   }
 

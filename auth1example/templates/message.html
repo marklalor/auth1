@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth1 Example Application</title>
+    <style type="text/css">
+        .gray-container {
+            background-color: #f1f1f1;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 50px;
+            padding: 10px;
+            border: 2px solid #d1d1d1;
+        }
+    </style>
+</head>
+<body>
+    <div class=".gray-container">
+        {% if title %}
+        <h1>{{ title }}</h1>
+        {% endif %}
+        {% if message %}
+        <div>{{ message }}</div>
+        {% endif %}
+    </div>
+</form>
+</body>
+</html>

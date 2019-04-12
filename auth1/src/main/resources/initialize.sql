@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `TentativeTOTPConfiguration` (
 	`user_id` INT NOT NULL,
 	`tentative_totp_secret` BINARY(80) NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
+	UNIQUE (user_id),
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`user_id`) REFERENCES User(`id`)
 );

@@ -1,5 +1,6 @@
 import requests
 
+
 class Auth1Client(object):
     def __init__(self, base_url):
         self.base_url = base_url
@@ -21,6 +22,12 @@ class Auth1Client(object):
         
         r = requests.post(f'{self.base_url}/login', data=req_body)
         return r.json()
+
+    def requestTotpSecret(self, token):
+        return requests.post(f'{self.base_url}/requestTotpSecret', data={'token': token}).json()
+
+    def confirmTotpSecret(self, token, code):
+        return requests.post(f'{self.base_url}/validateTotpSecret', data={'token': token, 'code': code}).json()
 
     def check_auth_token(self, token):
         if not token:

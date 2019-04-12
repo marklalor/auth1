@@ -2,6 +2,10 @@ package org.auth1.auth1.dao;
 
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.TentativeTOTPConfiguration;
+import org.auth1.auth1.model.entities.UserAuthenticationToken;
+import org.auth1.auth1.util.DBUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.stereotype.Repository;
 
@@ -18,11 +22,21 @@ public class TentativeTOTPConfigurationDaoImpl implements TentativeTOTPConfigura
 
     @Override
     public Optional<TentativeTOTPConfiguration> getConfiguration(int userId) {
-        throw new NotYetImplementedException();
+        final SessionFactory sessionFactory = databaseManager.getSessionFactory();
+        final Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        final Object obj = session.createQuery("FROM TentativeTOTPConfiguration c WHERE c.userId = :value")
+                .setParameter("value", userId)
+                .uniqueResult();
+        session.getTransaction().commit();
+        if(obj instanceof TentativeTOTPConfiguration)
+            return Optional.of((TentativeTOTPConfiguration) obj);
+        else
+            return Optional.empty();
     }
 
     @Override
     public void saveConfiguration(TentativeTOTPConfiguration configuration) {
-        throw new NotYetImplementedException();
+        DBUtils.saveEntity(databaseManager, configuration);
     }
 }

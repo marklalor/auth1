@@ -15,7 +15,7 @@ public class CheckAuthenticationTokenResponse {
     }
 
     static CheckAuthenticationTokenResponse fromResult(CheckAuthenticationTokenResult result) {
-        return new CheckAuthenticationTokenResponse(result.isValid(), result.getUserId());
+        return new CheckAuthenticationTokenResponse(result.isValid(), result.isValid() ? result.getUserId() : -1);
     }
 
     public boolean isValid() {

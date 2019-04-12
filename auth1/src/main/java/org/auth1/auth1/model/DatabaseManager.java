@@ -30,6 +30,7 @@ public class DatabaseManager {
 
         hibernateConfiguration.addAnnotatedClass(LoginRecord.class);
         hibernateConfiguration.addAnnotatedClass(PasswordlessLoginToken.class);
+        hibernateConfiguration.addAnnotatedClass(TentativeTOTPConfiguration.class);
         hibernateConfiguration.addAnnotatedClass(PasswordResetToken.class);
         hibernateConfiguration.addAnnotatedClass(User.class);
         hibernateConfiguration.addAnnotatedClass(UserToken.class);

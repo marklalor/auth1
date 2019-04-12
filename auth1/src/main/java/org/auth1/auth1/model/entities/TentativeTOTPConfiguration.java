@@ -6,6 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+@Entity
+@Table(name = "TentativeTOTPConfiguration")
 public class TentativeTOTPConfiguration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +37,7 @@ public class TentativeTOTPConfiguration {
     public final static TimeUnit VALIDITY_DURATION_UNITS = TimeUnit.MINUTES;
 
     public static TentativeTOTPConfiguration forUser(int userId) {
-        final byte[] secret = new byte[80];
+        final byte[] secret = new byte[10];
         new SecureRandom().nextBytes(secret);
         final ZonedDateTime expirationTime = ZonedDateTime.now().plus(VALIDITY_DURATION, VALIDITY_DURATION_UNITS.toChronoUnit());
         return new TentativeTOTPConfiguration(userId, secret, expirationTime);
@@ -55,6 +57,22 @@ public class TentativeTOTPConfiguration {
 
     public ZonedDateTime getExpirationTime() {
         return expirationTime;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setTentativeTOTPSecret(byte[] tentativeTOTPSecret) {
+        this.tentativeTOTPSecret = tentativeTOTPSecret;
+    }
+
+    public void setExpirationTime(ZonedDateTime expirationTime) {
+        this.expirationTime = expirationTime;
     }
 
     @Override
