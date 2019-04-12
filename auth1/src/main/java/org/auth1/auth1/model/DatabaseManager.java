@@ -17,6 +17,8 @@ public class DatabaseManager {
     private final SessionFactory sessionFactory;
 
     public DatabaseManager(DatabaseConfiguration configuration) {
+        System.out.println("Hello world");
+        System.out.println("Config: " + configuration.toString());
         this.configuration = configuration;
         this.sessionFactory = initializeHibernate(configuration);
     }
@@ -30,12 +32,12 @@ public class DatabaseManager {
 
         hibernateConfiguration.addAnnotatedClass(LoginRecord.class);
         hibernateConfiguration.addAnnotatedClass(PasswordlessLoginToken.class);
-        hibernateConfiguration.addAnnotatedClass(TentativeTOTPConfiguration.class);
         hibernateConfiguration.addAnnotatedClass(PasswordResetToken.class);
         hibernateConfiguration.addAnnotatedClass(User.class);
         hibernateConfiguration.addAnnotatedClass(UserToken.class);
         hibernateConfiguration.addAnnotatedClass(UserVerificationToken.class);
         hibernateConfiguration.addAnnotatedClass(UserAuthenticationToken.class);
+        hibernateConfiguration.addAnnotatedClass(TentativeTOTPConfiguration.class);
 
         return hibernateConfiguration.buildSessionFactory();
     }
