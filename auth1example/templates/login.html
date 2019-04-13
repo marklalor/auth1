@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Auth1 Example Application</title>
@@ -15,26 +16,30 @@
         }
     </style>
 </head>
+
 <body>
-<form action="{{ url_for('login') }}" method="post">
-    <div id="login-container">
-        <h1>Login</h1>
-        {% if message %}
+    <form action="{{ url_for('login') }}" method="post">
+        <div id="login-container">
+            <h1>Login</h1>
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
             <div style="color: darkred;margin-bottom: 15px;">
                 {{ message }}
             </div>
-        {% endif %}
-        <div>
-            <label for="username"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="username">
-        </div>
+            {% endfor %}
+            {% endwith %}
+            <div>
+                <label for="username"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="username">
+            </div>
 
-        <div>
-            <label for="password"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="password">
-            <button type="submit" style="font-size: 1.5em; margin-left: 10px;">Login</button>
+            <div>
+                <label for="password"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="password">
+                <button type="submit" style="font-size: 1.5em; margin-left: 10px;">Login</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 </body>
+
 </html>

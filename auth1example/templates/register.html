@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Auth1 Example Application</title>
+    <style type="text/css">
+        #card {
+            background-color: #f1f1f1;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 50px;
+            padding: 10px;
+            border: 2px solid #d1d1d1;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="{{ url_for('register') }}" method="post">
+        <div id="card">
+            <h1>Register Account</h1>
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            <div style="color: darkred;margin-bottom: 15px;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endwith %}
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        <label for="email"><b>Email</b></label>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="Enter Email" name="email">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="username"><b>Username</b></label>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="Enter Username" name="username">
+                    </td>
+                </tr>
+
+                <tr>
+                    <div>
+                        <td>
+                            <label for="password"><b>Password</b></label>
+                        </td>
+                        <td>
+                            <input type="password" placeholder="Enter Password" name="password">
+                        </td>
+                    </div>
+                </tr>
+            </table>
+
+            <button type="submit" style="font-size: 1.5em; margin-left: 10px;">Register</button>
+        </div>
+    </form>
+</body>
+
+</html>

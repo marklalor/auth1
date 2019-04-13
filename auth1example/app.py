@@ -5,12 +5,12 @@ from auth1api import Auth1Client
 
 import functools
 
-from flask import (g, request, make_response, render_template)
+from flask import (g, request, make_response, render_template, flash)
 
-auth1 = Auth1Client('http://localhost:8080')
+auth1 = Auth1Client('http://localhost:50505')
 
 app = Flask(__name__)
-
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 def login_required(view):
     @functools.wraps(view)
@@ -35,6 +35,34 @@ def login_required(view):
 def main():
     return make_response(render_template('index.html', user_id=g.user_id))
 
+@app.route('/register', methods=['GET'])
+def register_page():
+    return make_response(render_template('register.html'))
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    email = request.form['email'] if 'email' in request.form else ''
+    username = request.form['username'] if 'username' in request.form else ''
+    password = request.form['password'] if 'password' in request.form else ''
+
+    register_response = auth1.register(username, email, password)
+
+    if register_response['result'] == 'SUCCESS':
+        flash('You successfully created an account')
+        return redirect(url_for('login'))
+
+    if register_response['result'] == 'USERNAME_DUPLICATE':
+        flash("Username '%s' already exists" % username)
+        return redirect(url_for('register'))
+
+    if register_response['result'] == 'EMAIL_DUPLICATE':
+        flash("Email '%s' already exists" % email)
+        return redirect(url_for('register'))
+
+    flash('Unable to create account. Please check that all fields are filled out and try again later')
+    return redirect(url_for('register'))
+
 
 @app.route('/login', methods=['GET'])
 def login_page():
@@ -43,7 +71,8 @@ def login_page():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    resp = make_response(render_template('login.html', message='Logged out.'))
+    flash('Logged out.')
+    resp = redirect(url_for('login'))
     resp.set_cookie('token', '', expires=0)
     return resp
 
@@ -61,7 +90,8 @@ def login():
         resp.set_cookie('token', token)
         return resp
     else:
-        return make_response(render_template('login.html', message='Bad username or password, please try again.'))
+        flash('Bad username or password, please try again.')
+        return redirect(url_for('login'))
 
 
 @app.route('/createTOTP', methods=['GET'])
