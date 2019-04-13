@@ -1,3 +1,7 @@
+4/12/19:
+- I helped set up docker with Yidi
+- I added account throttling using Redis
+
 4/5/19:
 - I added a Python library that allows middle users to easily make requests to their Auth1 instance
 - I uploaded auth1api to PyPi: https://pypi.org/project/auth1api/
