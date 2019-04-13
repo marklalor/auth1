@@ -42,3 +42,9 @@
 - Added pages to Flask app for the login and checking of the authentication token.
 - Added creation of LoginRecord objects to the authentication process.
 - Added additional parameters to authenticate to account for user ip and user agent.
+
+4/12/2019
+- Added TOTP registration logic to the example front end.
+- Display QR code for TOTP setup.
+- Fix bugs in the API that were noticable when testing on the front end.
+- Fix key lengths that were too long (e.g. 80 bytes instead of 80 bits)
