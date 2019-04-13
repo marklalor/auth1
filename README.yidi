@@ -48,3 +48,7 @@ same container, but eventually realized that it's not easy to combine two contai
 spin up separate containers for db and application. It makes configuring each one cleaner, but there's some
 trickiness in the orchestration.
 - Currently have a non-functioning docker setup, but I'm confident I'll get there soon.
+
+4/12:
+- Brian and I got the docker-compose to work. The only difference from last week's file was that we needed to change the hostname for the database. We spent an hour debugging this one line issue. Super frustrating - wish this were better documented! 
+- Worked on the demo app that Mark and Brian started last week. I built the register page and did a refactoring to use Flask's message flashing feature to pass messages between routes. 
