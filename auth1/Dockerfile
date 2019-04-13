@@ -7,9 +7,6 @@ ARG APP_CONFIG=src/main/resources/auth1.docker.cnf
 ARG REDIS_CONFIG=src/main/resources/redis.docker.cnf
 
 ENV PORT=${PORT}
-ENV DB_CONFIG=${DB_CONFIG}
-ENV APP_CONFIG=${APP_CONFIG}
-ENV REDIS_CONFIG=${REDIS_CONFIG}
 
 VOLUME /tmp
 
