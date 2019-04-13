@@ -6,6 +6,7 @@ import org.auth1.auth1.core.authentication.AuthenticationManager;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
 import org.auth1.auth1.core.authentication.CheckAuthenticationTokenResult;
 import org.auth1.auth1.core.authentication.UserIdentifier;
+import org.auth1.auth1.core.throttling.AuthenticationThrottler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +20,25 @@ public class AuthenticationController {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    AuthenticationThrottler authenticationThrottler;
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<LoginResponse> login(@RequestParam(value = "usernameOrEmail", required = false) String usernameOrEmail,
                                                @RequestParam(value = "username", required = false) String username,
                                                @RequestParam(value = "email", required = false) String email,
                                                @RequestParam(value = "password", required = true) String password,
                                                @RequestParam(value = "totpCode", required = false) String totpCode) {
-        if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(authenticationThrottler.loginAllowed(username)) {
+            if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            } else {
+                final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
+                final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode, null, null);
+                return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
+            }
         } else {
-            final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
-            final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode, null, null);
-            return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
     }
 

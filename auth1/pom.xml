@@ -50,6 +50,13 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>3.0.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
 
 
     <!-- Test Dependencies -->
@@ -143,6 +150,7 @@
             <PORT>50505</PORT>
             <DB_CONFIG>src/main/resources/database.example.cnf</DB_CONFIG>
             <APP_CONFIG>src/main/resources/auth1.example.cnf</APP_CONFIG>
+            <REDIS_CONFIG>src/main/resources/redis.example.cnf</REDIS_CONFIG>
             <MYSQL_DATABASE>auth1</MYSQL_DATABASE>
             <MYSQL_USER>auth1</MYSQL_USER>
             <MYSQL_PASSWORD>password</MYSQL_PASSWORD>

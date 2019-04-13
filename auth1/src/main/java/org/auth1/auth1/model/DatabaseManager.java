@@ -17,8 +17,6 @@ public class DatabaseManager {
     private final SessionFactory sessionFactory;
 
     public DatabaseManager(DatabaseConfiguration configuration) {
-        System.out.println("Hello world");
-        System.out.println("Config: " + configuration.toString());
         this.configuration = configuration;
         this.sessionFactory = initializeHibernate(configuration);
     }

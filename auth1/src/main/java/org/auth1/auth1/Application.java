@@ -3,6 +3,7 @@ package org.auth1.auth1;
 import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.Configuration;
 import org.auth1.auth1.model.DatabaseConfiguration;
+import org.auth1.auth1.model.RedisConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,6 +37,19 @@ public class Application {
         try {
             return
                     Auth1Configuration.fromConfigurationFile(new FileInputStream(auth1ConfigurationPath));
+        } catch (IOException | Configuration.InvalidConfigurationException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
+    }
+
+    @Bean
+    public RedisConfiguration redisConfiguration(@Value("${config.redisConfigurationPath}")
+                                                         String redisConfigurationPath) {
+        try {
+            return
+                    RedisConfiguration.fromConfigurationFile(new FileInputStream(redisConfigurationPath));
         } catch (IOException | Configuration.InvalidConfigurationException e) {
             e.printStackTrace();
             System.exit(1);

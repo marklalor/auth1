@@ -71,4 +71,15 @@ public class DatabaseConfiguration {
 
         return new DatabaseConfiguration(ip, port, database, username, password);
     }
+
+    @Override
+    public String toString() {
+        return "DatabaseConfiguration{" +
+                "ip=" + ip +
+                ", port=" + port +
+                ", database='" + database + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }
