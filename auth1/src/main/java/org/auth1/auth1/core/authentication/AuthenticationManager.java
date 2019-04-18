@@ -21,6 +21,9 @@ import org.auth1.auth1.dao.LoginRecordDao;
 import org.auth1.auth1.dao.TentativeTOTPConfigurationDao;
 import org.auth1.auth1.dao.TokenDao;
 import org.auth1.auth1.dao.UserDao;
+import org.auth1.auth1.err.EmailAlreadyExistsException;
+import org.auth1.auth1.err.UsernameAlreadyExistsException;
+import org.auth1.auth1.err.UserDoesNotExistException;
 import org.auth1.auth1.model.Auth1Configuration;
 import org.auth1.auth1.model.entities.*;
 import org.slf4j.Logger;
@@ -136,7 +139,11 @@ public class AuthenticationManager {
                 .map(user -> {
                     if (this.passwordConformsToRules(newPassword)) {
                         user.setPassword(this.config.getHashFunction().hash(newPassword));
-                        userDao.saveUser(user);
+                        try {
+                            userDao.resetPassword(user.getAnyUserIdentifier(), user.getPassword());
+                        } catch (UserDoesNotExistException e) {
+                            return ResetPasswordResult.USER_DOES_NOT_EXIST;
+                        }
                         logger.debug("Successfully reset password for " + user.getAnyUserIdentifier());
                         return ResetPasswordResult.SUCCESS;
                     } else {
@@ -196,7 +203,13 @@ public class AuthenticationManager {
 
         final var password = this.config.getHashFunction().hash(rawPassword);
         final var newUser = new User(username, password, null, email, false, false, ZonedDateTime.now());
-        userDao.saveUser(newUser);
+        try {
+            userDao.saveUser(newUser);
+        } catch (UsernameAlreadyExistsException e) {
+            return RegistrationResult.USERNAME_DUPLICATE;
+        } catch (EmailAlreadyExistsException e) {
+            return RegistrationResult.EMAIL_DUPLICATE;
+        }
         logger.debug("Created new user: (username=\"" + username + "\", email=\"" + email + "\"");
         return this.config.isEmailVerificationRequired()
                 ? RegistrationResult.SUCCESS_CONFIRM_EMAIL : RegistrationResult.SUCCESS;
@@ -228,7 +241,13 @@ public class AuthenticationManager {
                             Optional<User> userById = userDao.getUserById(userId);
                             userById.map(user -> {
                                 user.setTotpSecret(config.getTentativeTOTPSecret());
-                                userDao.saveUser(user);
+                                try {
+                                    userDao.saveUser(user);
+                                } catch (UsernameAlreadyExistsException e) {
+                                    return ConfirmTentativeTOTPResult.USERNAME_ALREADY_EXISTS;
+                                } catch (EmailAlreadyExistsException e) {
+                                    return ConfirmTentativeTOTPResult.EMAIL_ALREADY_EXISTS;
+                                }
                                 return ConfirmTentativeTOTPResult.SUCCESS;
                             }).orElse(ConfirmTentativeTOTPResult.INVALID_TOKEN);
                             return ConfirmTentativeTOTPResult.SUCCESS;

@@ -1,12 +1,16 @@
 package org.auth1.auth1.dao;
 
 import org.auth1.auth1.core.authentication.UserIdentifier;
+import org.auth1.auth1.err.EmailAlreadyExistsException;
+import org.auth1.auth1.err.UsernameAlreadyExistsException;
 import org.auth1.auth1.err.UserDoesNotExistException;
+import org.auth1.auth1.model.ConstraintNames;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.util.DBUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -21,8 +25,16 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void saveUser(final User user) {
-        DBUtils.saveEntity(databaseManager, user);
+    public void saveUser(final User user) throws UsernameAlreadyExistsException, EmailAlreadyExistsException {
+        try {
+            DBUtils.saveEntity(databaseManager, user);
+        } catch (ConstraintViolationException e) {
+            if (e.getConstraintName().equals(ConstraintNames.UNIQUE_USERNAME_CONSTRAINT)) {
+                throw new UsernameAlreadyExistsException(user.getUsername());
+            } else if (e.getConstraintName().equals(ConstraintNames.UNIQUE_EMAIL_CONSTRAINT)) {
+                throw new EmailAlreadyExistsException(user.getEmail());
+            }
+        }
     }
 
     @Override

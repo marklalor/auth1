@@ -18,5 +18,9 @@ public enum ResetPasswordResult {
     /**
      * The new password was invalid as it did not follow the password rules for this Auth1 instance.
      */
-    INVALID_PASSWORD
+    INVALID_PASSWORD,
+    /**
+     * The user does not exist
+     */
+    USER_DOES_NOT_EXIST
 }

@@ -1,5 +1,6 @@
 package org.auth1.auth1.dao;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.PasswordResetToken;
 import org.auth1.auth1.model.entities.User;
@@ -8,6 +9,7 @@ import org.auth1.auth1.util.DBUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.NotYetImplementedException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -23,12 +25,20 @@ public class TokenDaoImpl implements TokenDao {
 
     @Override
     public void saveLoginToken(UserAuthenticationToken token) {
-        DBUtils.saveEntity(databaseManager, token);
+        try {
+            DBUtils.saveEntity(databaseManager, token);
+        } catch (ConstraintViolationException e) {
+            e.printStackTrace(); // TODO: Handle duplicate login token
+        }
     }
 
     @Override
     public void savePasswordResetToken(PasswordResetToken token) {
-        DBUtils.saveEntity(databaseManager, token);
+        try {
+            DBUtils.saveEntity(databaseManager, token);
+        } catch (ConstraintViolationException e) {
+            e.printStackTrace(); // TODO: Handle duplicate reset token
+        }
     }
 
     @Override
