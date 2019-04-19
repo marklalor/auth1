@@ -81,8 +81,9 @@ def logout():
 def login():
     username = request.form['username'] if 'username' in request.form else ''
     password = request.form['password'] if 'password' in request.form else ''
+    totp_code = request.form['totp'] if 'totp' in request.form else ''
 
-    login_response = auth1.login(None, username, None, password)
+    login_response = auth1.login(None, username, None, password, totp_code)
 
     if login_response['resultType'] == 'SUCCESS':
         token = login_response['token']['tokenValue']
@@ -90,7 +91,15 @@ def login():
         resp.set_cookie('token', token)
         return resp
     else:
-        flash('Bad username or password, please try again.')
+        responses = {
+            'USER_DOES_NOT_EXIST': 'Bad username or password, please try again.',
+            'BAD_PASSWORD': 'Bad username or password, please try again.',
+            'TOTP_REQUIRED': 'Two-factor authentication required, please provide TOTP code.',
+            'BAD_TOTP': 'TOTP code was incorrect, please try again.',
+            'NOT_VERIFIED': 'The account you\'re trying to log in to is unverified',
+            'ACCOUNT_LOCKED': 'Account locked, please contact an server administrator.'
+        }
+        flash(responses[login_response['resultType']])
         return redirect(url_for('login'))
 
 

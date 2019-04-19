@@ -11,7 +11,7 @@ class Auth1Client(object):
                           data=req_body)
         return r.json()
 
-    def login(self, username_or_email, username, email, password):
+    def login(self, username_or_email, username, email, password, totpCode):
         req_body = {'password': password}
         if username_or_email:
             req_body['usernameOrEmail'] = username_or_email
@@ -19,6 +19,8 @@ class Auth1Client(object):
             req_body['username'] = username
         elif email:
             req_body['email'] = email
+        if totpCode:
+            req_body['totpCode'] = totpCode
         
         r = requests.post(f'{self.base_url}/login', data=req_body)
         return r.json()

@@ -28,16 +28,27 @@
             </div>
             {% endfor %}
             {% endwith %}
-            <div>
-                <label for="username"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="username">
-            </div>
 
-            <div>
-                <label for="password"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="password">
-                <button type="submit" style="font-size: 1.5em; margin-left: 10px;">Login</button>
-            </div>
+            <table cellpadding="5px" cellspacing="0" border="0">
+                <tbody>
+                    <tr>
+                        <td style="text-align: right;"><label for="username"><b>Username</b></label></td>
+                        <td><input type="text" placeholder="Enter Username" name="username"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;"><label for="password"><b>Password</b></label></td>
+                        <td><input type="password" placeholder="Enter Password" name="password"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;"><label for="totp"><b>TOTP Code (Optional)</b></label></td>
+                        <td><input type="password" placeholder="TOTP Code" name="totp"></td>
+                        <td><button type="submit" style="font-size: 1.2em; margin-left: 10px;">Login</button></td>
+                    </tr>
+                    <tr>
+                        <td>or <a href = "{{ url_for('register_page') }}">create new account</a></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </form>
 </body>

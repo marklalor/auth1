@@ -11,14 +11,16 @@
 </head>
 <body>
     <h1>Auth1 Example Application</h1>
-    <p>Logged in with user id of {{ user_id }}.</p>
+    <p>Logged in successfully.</p>
+    <p>User ID: <span style="text-decoration: underline;">{{ user_id }}</span></p>
     <p id="cookie-p"></p>
 
-    <a href = "{{ url_for('logout') }}">Log out</a>
+    <div><a href = "{{ url_for('create_totp') }}">Set up TOTP</a></div>
+    <div><a href = "{{ url_for('logout') }}">Log out</a></div>
 
     <script type="text/javascript">
         let tokenCookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-        document.getElementById("cookie-p").innerHTML = 'Cookie "token" = ' + tokenCookieValue
+        document.getElementById("cookie-p").innerHTML = 'Token cookie: <span style="text-decoration: underline;">' + tokenCookieValue + '</span>'
     </script>
 </body>
 </html>
