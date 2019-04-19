@@ -29,7 +29,7 @@ public class AuthenticationController {
                                                @RequestParam(value = "email", required = false) String email,
                                                @RequestParam(value = "password", required = true) String password,
                                                @RequestParam(value = "totpCode", required = false) String totpCode) {
-        if(authenticationThrottler.loginAllowed(username)) {
+        if(authenticationThrottler.loginAllowed(username, email, usernameOrEmail)) {
             if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else {

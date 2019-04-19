@@ -12,5 +12,6 @@ public class DBUtils {
         session.beginTransaction();
         session.save(entityObj);
         session.getTransaction().commit();
+        session.close();
     }
 }
