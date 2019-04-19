@@ -1,11 +1,6 @@
 package org.auth1.auth1.integration;
 
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.ZonedDateTime;
 import org.auth1.auth1.Application;
 import org.auth1.auth1.api.login.LoginResponse;
 import org.auth1.auth1.core.authentication.AuthenticationResult;
@@ -21,6 +16,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import java.time.ZonedDateTime;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = Application.class)
@@ -29,12 +31,14 @@ import org.springframework.test.web.servlet.MockMvc;
 public class LoginIntegrationTest {
 
     private static final ZonedDateTime NOW = ZonedDateTime.now();
-    private final String ENDPOINT = "/login";
-    private final String VALID_USERNAME = "username";
-    private final String VALID_EMAIL = "user@email.com";
-    private final String VALID_PASSWORD = "password";
-    private final String INVALID_PASSWORD = "badpass";
-    private final ExpiringToken VALID_TOKEN = new ExpiringToken("foo", NOW);
+    private static final String ENDPOINT = "/login";
+    private static final String VALID_USERNAME = "username";
+    private static final String THROTTLE_USERNAME = "throttleme";
+    private static final String THROTTLE_EMAIL = "throttle@me.com";
+    private static final String VALID_EMAIL = "user@email.com";
+    private static final String VALID_PASSWORD = "password";
+    private static final String INVALID_PASSWORD = "badpass";
+    private static final ExpiringToken VALID_TOKEN = new ExpiringToken("foo", NOW);
 
     private JacksonTester<LoginResponse> responseJson;
 
@@ -76,5 +80,27 @@ public class LoginIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"));
 //                .andExpect(content().json(responseJson.write(expected).getJson()));
+    }
+
+    @Test
+    public void loginStress() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            ResultActions usernameResult = this.mvc.perform(post(ENDPOINT).param("username", THROTTLE_USERNAME)
+                    .param("password", VALID_PASSWORD));
+            ResultActions emailResult = this.mvc.perform(post(ENDPOINT).param("email", THROTTLE_EMAIL)
+                    .param("password", VALID_PASSWORD));
+            if (i < 2) {
+                usernameResult.andExpect(status().isOk());
+                emailResult.andExpect(status().isOk());
+            } else {
+                usernameResult.andExpect(status().isTooManyRequests());
+                emailResult.andExpect(status().isTooManyRequests());
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            ResultActions usernameOrEmailResult = this.mvc.perform(post(ENDPOINT).param("usernameOrEmail", THROTTLE_EMAIL)
+                    .param("password", VALID_PASSWORD));
+            usernameOrEmailResult.andExpect(status().isTooManyRequests());
+        }
     }
 }

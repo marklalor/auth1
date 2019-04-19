@@ -16,6 +16,7 @@ public class DBUtils {
         session.beginTransaction();
         operation.accept(session);
         session.getTransaction().commit();
+        session.close();
     }
 
     public static void saveOrUpdateEntity(final DatabaseManager databaseManager, Object entityObj) throws ConstraintViolationException {
