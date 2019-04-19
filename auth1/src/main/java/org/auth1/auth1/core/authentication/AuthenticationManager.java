@@ -357,6 +357,9 @@ public class AuthenticationManager {
 
     private AuthenticationStepResult checkTOTP(User user, final String rawPassword, final @Nullable String totpCode) {
         logger.debug("Authentication step: checking TOTP code. " + user.getAnyUserIdentifier());
+        if (user.getTotpSecret() != null && (totpCode == null || "".equals(totpCode))) {
+            return of(AuthenticationResult.TOTP_REQUIRED);
+        }
         return Optional.ofNullable(user.getTotpSecret())
                 .map(secret -> checkTOTP(secret, totpCode))
                 .map(result -> result ? stepPassed() : of(AuthenticationResult.BAD_TOTP))
