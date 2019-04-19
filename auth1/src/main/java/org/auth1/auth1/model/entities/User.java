@@ -1,6 +1,7 @@
 package org.auth1.auth1.model.entities;
 
 import org.auth1.auth1.core.authentication.UserIdentifier;
+import org.auth1.auth1.model.ConstraintNames;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
@@ -8,7 +9,17 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"username"},
+                        name = ConstraintNames.UNIQUE_USERNAME_CONSTRAINT
+                ),
+                @UniqueConstraint(
+                        columnNames = {"email"},
+                        name = ConstraintNames.UNIQUE_EMAIL_CONSTRAINT
+                )
+        })
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

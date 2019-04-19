@@ -3,7 +3,9 @@ package org.auth1.auth1.dao;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.auth1.auth1.core.authentication.UserIdentifier;
 import org.auth1.auth1.database.DatabaseLoader;
+import org.auth1.auth1.err.EmailAlreadyExistsException;
 import org.auth1.auth1.err.UserDoesNotExistException;
+import org.auth1.auth1.err.UsernameAlreadyExistsException;
 import org.auth1.auth1.model.DatabaseManager;
 import org.auth1.auth1.model.entities.User;
 import org.auth1.auth1.test_entities.ExampleUser;
@@ -47,7 +49,7 @@ class UserDaoImplTest {
     }
 
     @Test
-    void register() throws SQLException {
+    void register() throws SQLException, EmailAlreadyExistsException, UsernameAlreadyExistsException {
         userDao.saveUser(ExampleUser.INSTANCE);
         final MysqlDataSource dataSource = DatabaseLoader.getMySqlDataSource();
         try (Connection conn = dataSource.getConnection()) {
@@ -65,7 +67,15 @@ class UserDaoImplTest {
     }
 
     @Test
-    void getUserByUsername_exists() {
+    void register_userExists() {
+        Assertions.assertThrows(EmailAlreadyExistsException.class, () -> {
+            userDao.saveUser(ExampleUser.INSTANCE);
+            userDao.saveUser(ExampleUser.INSTANCE);
+        });
+    }
+
+    @Test
+    void getUserByUsername_exists() throws EmailAlreadyExistsException, UsernameAlreadyExistsException {
         final User exampleUser = ExampleUser.INSTANCE;
         userDao.saveUser(exampleUser);
         final Optional<User> user = userDao.getUserByUsername(ExampleUser.USERNAME);
@@ -79,7 +89,7 @@ class UserDaoImplTest {
     }
 
     @Test
-    void getUserByEmail_exists() {
+    void getUserByEmail_exists() throws EmailAlreadyExistsException, UsernameAlreadyExistsException {
         final User exampleUser = ExampleUser.INSTANCE;
         userDao.saveUser(exampleUser);
         final Optional<User> user = userDao.getUserByEmail(ExampleUser.EMAIL);
