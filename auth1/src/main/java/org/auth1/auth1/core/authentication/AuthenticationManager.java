@@ -241,13 +241,7 @@ public class AuthenticationManager {
                             Optional<User> userById = userDao.getUserById(userId);
                             userById.map(user -> {
                                 user.setTotpSecret(config.getTentativeTOTPSecret());
-                                try {
-                                    userDao.saveUser(user);
-                                } catch (UsernameAlreadyExistsException e) {
-                                    return ConfirmTentativeTOTPResult.USERNAME_ALREADY_EXISTS;
-                                } catch (EmailAlreadyExistsException e) {
-                                    return ConfirmTentativeTOTPResult.EMAIL_ALREADY_EXISTS;
-                                }
+                                userDao.updateUser(user);
                                 return ConfirmTentativeTOTPResult.SUCCESS;
                             }).orElse(ConfirmTentativeTOTPResult.INVALID_TOKEN);
                             return ConfirmTentativeTOTPResult.SUCCESS;

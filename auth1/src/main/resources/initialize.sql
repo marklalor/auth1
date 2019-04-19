@@ -63,10 +63,9 @@ CREATE TABLE IF NOT EXISTS `PasswordlessLoginToken` (
 
 CREATE TABLE IF NOT EXISTS `TentativeTOTPConfiguration` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`user_id` INT NOT NULL,
+	`user_id` INT NOT NULL UNIQUE,
 	`tentative_totp_secret` BINARY(80) NOT NULL,
 	`expiration_time` DATETIME NOT NULL,
-	UNIQUE (user_id),
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`user_id`) REFERENCES User(`id`)
 );

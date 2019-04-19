@@ -22,6 +22,13 @@
         {% if secret %}
             <div><img src = "{{ url_for('totp_qr', secret=secret) }}" style="width: 200px; display: block; margin: auto;"/></div>
         {% endif %}
+        {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+        <div style="color: darkred;margin-bottom: 15px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endwith %}
         <div>Scan the above image with your authenticator app and confirm the code below to complete the setup.</div>
         <div>
             <label for="code"><b>TOTP Code</b></label>

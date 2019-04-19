@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserDao {
     void saveUser(final User user) throws UsernameAlreadyExistsException, EmailAlreadyExistsException;
 
+    void updateUser(User user);
+
     void lockUser(final UserIdentifier userIdentifier);
 
     void unlockUser(final UserIdentifier userIdentifier);
@@ -24,6 +26,5 @@ public interface UserDao {
     Optional<User> getUserByEmail(final String email);
 
     Optional<User> getUserByUsernameOrEmail(final String usernameOrEmail);
-
 
 }

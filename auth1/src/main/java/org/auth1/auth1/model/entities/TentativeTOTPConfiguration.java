@@ -1,5 +1,7 @@
 package org.auth1.auth1.model.entities;
 
+import org.auth1.auth1.model.ConstraintNames;
+
 import javax.persistence.*;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
@@ -7,7 +9,12 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Entity
-@Table(name = "TentativeTOTPConfiguration")
+@Table(name = "TentativeTOTPConfiguration", uniqueConstraints = {
+    @UniqueConstraint(
+            columnNames = {"user_id"},
+            name = ConstraintNames.UNIQUE_USER_ID_CONSTRAINT
+    )
+})
 public class TentativeTOTPConfiguration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

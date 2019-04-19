@@ -118,8 +118,10 @@ def confirm_totp():
     response = auth1.confirmTotpSecret(g.token, request.form['code'])
     if response['resultType'] == 'SUCCESS':
         return make_response(render_template('message.html', title='TOTP Confirmed',
-                                             message='TOTP is now set up and ready to use with your account.'))
+                                             message=f'TOTP is now set up and ready to use with your account.',
+                                             link=url_for('main'), link_message='Back to main page.'))
     elif response['resultType'] == 'INVALID_CODE':
+        flash("Invalid TOTP code")
         return redirect(url_for('create_totp'))
 
 

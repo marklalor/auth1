@@ -40,6 +40,11 @@ public class TentativeTOTPConfigurationDaoImpl implements TentativeTOTPConfigura
 
     @Override
     public void saveConfiguration(TentativeTOTPConfiguration configuration) {
+        Optional<TentativeTOTPConfiguration> configuration1 = getConfiguration(configuration.getUserId());
+        if (configuration1.isPresent()) {
+            DBUtils.deleteEntity(databaseManager, configuration1.get());
+        }
+
         try {
             DBUtils.saveEntity(databaseManager, configuration);
         } catch (ConstraintViolationException e) {

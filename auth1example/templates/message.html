@@ -23,6 +23,9 @@
         {% if message %}
         <div>{{ message }}</div>
         {% endif %}
+        {% if link %}
+        <a href = "{{ link }}">{{ link_message }}</a>
+        {% endif %}
     </div>
 </form>
 </body>

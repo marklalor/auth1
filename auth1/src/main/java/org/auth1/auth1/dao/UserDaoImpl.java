@@ -38,6 +38,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public void updateUser(final User user) {
+        DBUtils.saveOrUpdateEntity(databaseManager, user);
+    }
+
+    @Override
     public void lockUser(UserIdentifier userIdentifier) {
        setUserLockedStatus(userIdentifier, true);
     }

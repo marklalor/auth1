@@ -15,6 +15,11 @@ public abstract class UnimplementedUserDao implements UserDao {
     }
 
     @Override
+    public void updateUser(User user) {
+        throw new NotYetImplementedException();
+    }
+
+    @Override
     public void lockUser(UserIdentifier userIdentifier) {
         throw new NotYetImplementedException();
     }
