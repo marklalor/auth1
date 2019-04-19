@@ -48,3 +48,8 @@
 - Display QR code for TOTP setup.
 - Fix bugs in the API that were noticable when testing on the front end.
 - Fix key lengths that were too long (e.g. 80 bytes instead of 80 bits)
+
+4/19/2019
+- Added TOTP to login form in example application.
+- Fixed bug with duplicate TentativeTOTPConfigurations being produced.
+- Reformatted parts of example application frontend.
