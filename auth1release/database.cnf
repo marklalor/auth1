@@ -1,0 +1,5 @@
+IP=mysql_fail
+PORT=3306
+DATABASE=auth1
+USERNAME=auth1
+PASSWORD=password

@@ -1,0 +1,28 @@
+version: '3'
+services:
+  web:
+    restart: always
+    image: "briungri/auth1"
+    environment:
+      DB_CONFIG: database.cnf
+      APP_CONFIG: auth1.cnf
+      REDIS_CONFIG: redis.cnf
+    ports:
+      - "50505:50505"
+    links:
+      - "mysql"
+      - "redis"
+    depends_on:
+      - "mysql"
+      - "redis"
+  mysql:
+    image: "mysql:5.6"
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: auth1
+      MYSQL_USER: auth1
+      MYSQL_PASSWORD: password
+  redis:
+    image: "redis:5.0"
