@@ -17,36 +17,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthenticationController {
-    @Autowired
-    AuthenticationManager authenticationManager;
 
-    @Autowired
-    AuthenticationThrottler authenticationThrottler;
+  @Autowired
+  AuthenticationManager authenticationManager;
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<LoginResponse> login(@RequestParam(value = "usernameOrEmail", required = false) String usernameOrEmail,
-                                               @RequestParam(value = "username", required = false) String username,
-                                               @RequestParam(value = "email", required = false) String email,
-                                               @RequestParam(value = "password", required = true) String password,
-                                               @RequestParam(value = "totpCode", required = false) String totpCode) {
-        if(authenticationThrottler.loginAllowed(username, email, usernameOrEmail)) {
-            if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            } else {
-                final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
-                final AuthenticationResult result = authenticationManager.authenticate(userId, password, totpCode, null, null);
-                return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
-            }
-        } else {
-            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
-        }
+  @Autowired
+  AuthenticationThrottler authenticationThrottler;
+
+  @RequestMapping(value = "/login", method = RequestMethod.POST)
+  public ResponseEntity<LoginResponse> login(
+      @RequestParam(value = "usernameOrEmail", required = false) String usernameOrEmail,
+      @RequestParam(value = "username", required = false) String username,
+      @RequestParam(value = "email", required = false) String email,
+      @RequestParam(value = "password", required = true) String password,
+      @RequestParam(value = "totpCode", required = false) String totpCode) {
+    if (Stream.of(username, email, usernameOrEmail).filter(Objects::nonNull).count() != 1) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } else {
+      final UserIdentifier userId = UserIdentifier.forOneOf(username, email, usernameOrEmail);
+      if (!authenticationThrottler.loginAllowed(userId)) {
+        return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+      }
+
+      final AuthenticationResult result = authenticationManager
+          .authenticate(userId, password, totpCode, null, null);
+      return ResponseEntity.ok(LoginResponse.fromAuthenticationResult(result));
     }
+  }
 
-    @RequestMapping(value = "/checkAuthToken", method = RequestMethod.POST)
-    public ResponseEntity<CheckAuthenticationTokenResponse> checkAuthToken(@RequestParam(value = "token", required =
-            true) String token) {
-        CheckAuthenticationTokenResult result = authenticationManager.checkAuthenticationToken(token);
+  @RequestMapping(value = "/checkAuthToken", method = RequestMethod.POST)
+  public ResponseEntity<CheckAuthenticationTokenResponse> checkAuthToken(
+      @RequestParam(value = "token", required =
+          true) String token) {
+    CheckAuthenticationTokenResult result = authenticationManager.checkAuthenticationToken(token);
 
-        return ResponseEntity.ok(CheckAuthenticationTokenResponse.fromResult(result));
-    }
+    return ResponseEntity.ok(CheckAuthenticationTokenResponse.fromResult(result));
+  }
 }

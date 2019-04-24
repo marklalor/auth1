@@ -108,8 +108,8 @@ def login():
 def create_totp():
     response = auth1.requestTotpSecret(g.token)
     if response['resultType'] == 'SUCCESS':
-        secret = response['tentativeTotpSecret']
-        return make_response(render_template('setUpTOTP.html', secret=secret))
+        g.secret = response['tentativeTotpSecret']
+        return make_response(render_template('setUpTOTP.html', secret=g.secret))
 
 
 @app.route('/confirmTOTP', methods=['POST'])
@@ -122,7 +122,7 @@ def confirm_totp():
                                              link=url_for('main'), link_message='Back to main page.'))
     elif response['resultType'] == 'INVALID_CODE':
         flash("Invalid TOTP code")
-        return redirect(url_for('create_totp'))
+        return make_response(render_template('setUpTOTP.html', secret=g.secret))
 
 
 @app.route('/totp_qr', methods=['GET'])
