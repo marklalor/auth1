@@ -1,12 +1,9 @@
-version: '3'
+version: '3.7'
 services:
   web:
+          # image: "briungri/auth1"
+    build: .
     restart: always
-    image: "briungri/auth1"
-    environment:
-      DB_CONFIG: database.cnf
-      APP_CONFIG: auth1.cnf
-      REDIS_CONFIG: redis.cnf
     ports:
       - "50505:50505"
     links:
