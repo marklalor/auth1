@@ -1,3 +1,9 @@
+4/26/19:
+- I fixed a unit test bug with duplicate username inserts
+- I updated the PyPi auth1api release
+- I worked with Yidi to build a releasable .zip that doesn't require cloning our repo
+- I added repo documentation for the project root
+
 4/19/19:
 - I fixed a bug that allowed duplicate usernames/emails in the database
 - I found a bottleneck in the register function (the hash function)
