@@ -1,4 +1,4 @@
-FROM auth1:working
+FROM briungri/auth1:latest
 
 ARG DB_CONFIG=database.cnf
 ARG APP_CONFIG=auth1.cnf
