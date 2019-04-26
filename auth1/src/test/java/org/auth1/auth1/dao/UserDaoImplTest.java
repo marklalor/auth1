@@ -68,7 +68,7 @@ class UserDaoImplTest {
 
     @Test
     void register_userExists() {
-        Assertions.assertThrows(EmailAlreadyExistsException.class, () -> {
+        Assertions.assertThrows(UsernameAlreadyExistsException.class, () -> {
             userDao.saveUser(ExampleUser.INSTANCE);
             userDao.saveUser(ExampleUser.INSTANCE);
         });

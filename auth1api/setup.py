@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="auth1api",
-    version="0.0.3",
+    version="1.0.0",
     author="Brian Li, Mark Lalor, and Yidi Huang",
     author_email="auth1@case.edu",
     description="A library to make requests to your Auth1 instance",
