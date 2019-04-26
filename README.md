@@ -1,4 +1,7 @@
 # Auth1
+
+View the API [here](api.md).
+
 This project contains 4 directories:
 #### auth1/
 In this directory, you will find the source code for the Auth1 service. The Auth1 service is built with the [Spring Boot framework](https://spring.io/projects/spring-boot). You can run the service by using Maven to create the .jar file and either manually run the .jar file (assumes MySQL and Redis are running) or use the docker-compose.yml to run Auth1 with MySQL and Redis.
