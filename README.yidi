@@ -56,3 +56,7 @@ trickiness in the orchestration.
 4/19:
 - We're done with almost everything at this point. This week is just tying up some loose ends
 - I fixed some tests that were broken from adding the throttling and made a change to the demo app
+
+4/26:
+- We were basically done at this point. Updated the docker/compose setup so that you can download just the 2 docker files + 3 config files and the Dockerfile will build a container with your configurations and you don't have to touch the repo.
+- Also worked on presentation/report this week

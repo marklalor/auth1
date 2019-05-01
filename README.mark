@@ -53,3 +53,6 @@
 - Added TOTP to login form in example application.
 - Fixed bug with duplicate TentativeTOTPConfigurations being produced.
 - Reformatted parts of example application frontend.
+
+4/26/2019
+- Create documentation of entire Auth1 API.
