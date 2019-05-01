@@ -1,7 +1,6 @@
 version: '3.7'
 services:
   web:
-          # image: "briungri/auth1"
     build: .
     restart: always
     ports:

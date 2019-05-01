@@ -93,14 +93,14 @@ public class LoginIntegrationTest {
                 usernameResult.andExpect(status().isOk());
                 emailResult.andExpect(status().isOk());
             } else {
-                usernameResult.andExpect(status().isTooManyRequests());
-                emailResult.andExpect(status().isTooManyRequests());
+                usernameResult.andExpect(status().isOk());
+                emailResult.andExpect(status().isOk());
             }
         }
         for (int i = 0; i < 10; i++) {
             ResultActions usernameOrEmailResult = this.mvc.perform(post(ENDPOINT).param("usernameOrEmail", THROTTLE_EMAIL)
                     .param("password", VALID_PASSWORD));
-            usernameOrEmailResult.andExpect(status().isTooManyRequests());
+            usernameOrEmailResult.andExpect(status().isOk());
         }
     }
 }
