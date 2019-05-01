@@ -10,6 +10,7 @@ import redis.clients.jedis.Jedis;
 public class AuthenticationThrottler {
 
     private final Jedis jedis;
+
     private final int requestsAllowedPerMinute;
 
     public AuthenticationThrottler(RedisManager redisManager, RedisConfiguration redisConfiguration) {
@@ -26,5 +27,9 @@ public class AuthenticationThrottler {
         }
         int numLogins = Integer.parseInt(jedis.get(key));
         return numLogins <= requestsAllowedPerMinute;
+    }
+
+    public int getRequestsAllowedPerMinute() {
+        return requestsAllowedPerMinute;
     }
 }
