@@ -93,6 +93,7 @@ def login():
     else:
         responses = {
             'USER_DOES_NOT_EXIST': 'Bad username or password, please try again.',
+            'TOO_MANY_REQUESTS': 'Too many requests made, please try again later.',
             'BAD_PASSWORD': 'Bad username or password, please try again.',
             'TOTP_REQUIRED': 'Two-factor authentication required, please provide TOTP code.',
             'BAD_TOTP': 'TOTP code was incorrect, please try again.',
